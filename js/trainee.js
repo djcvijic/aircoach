@@ -63,26 +63,8 @@ function updateTraineeDobDisplay() {
   }
 }
 
-// Mirrors log-session.js's date field: the invisible input covers the whole
-// field and receives every real click, but on desktop a click on a date
-// input's text area only focuses a segment rather than opening the
-// calendar, unlike a direct click on its small native icon. The display
-// button's own listener stays for keyboard activation, since it never
-// receives real pointer clicks.
 function openTraineeDobPicker() {
-  var opened = false;
-  if (traineeDobInput.showPicker) {
-    try {
-      traineeDobInput.showPicker();
-      opened = true;
-    } catch (e) {
-      // Some mobile browsers throw here even though showPicker exists;
-      // fall through to focus() below instead of doing nothing.
-    }
-  }
-  if (!opened) {
-    traineeDobInput.focus();
-  }
+  openNativeDatePicker(traineeDobInput);
 }
 
 traineeDobInput.addEventListener('click', openTraineeDobPicker);

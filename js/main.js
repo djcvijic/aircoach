@@ -6,6 +6,26 @@
 // buttons know which guard to resolve.
 var activeUnsavedGuard = null;
 
+// Shared by every native date field's overlay input and decorative display
+// button (log-session.js, trainee.js): a plain click inside a date input
+// only focuses a segment, not the picker, so showPicker() is needed instead.
+function openNativeDatePicker(inputEl) {
+  var opened = false;
+  if (inputEl.showPicker) {
+    try {
+      inputEl.showPicker();
+      opened = true;
+    } catch (e) {
+      // Some mobile browsers throw here even though showPicker exists
+      // (e.g. treating this hidden proxy input as gesture-ineligible);
+      // fall through to focus() below instead of doing nothing.
+    }
+  }
+  if (!opened) {
+    inputEl.focus();
+  }
+}
+
 function goHome() {
   currentTraineeId = null;
   renderTrainees();

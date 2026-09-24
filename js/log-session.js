@@ -44,28 +44,12 @@ function updateLogSessionDateDisplay() {
   logSessionDateTextEl.textContent = value ? formatDayHeader(parseDateOnly(value)) : '';
 }
 
-// The invisible input covers the whole field and receives every real
-// click (that's the point, for reliable mobile taps), so this same logic
-// is needed on the input's own click too: on desktop, clicking a date
-// input's text area only focuses a date segment rather than opening the
-// calendar, unlike a direct click on its small native icon. The display
-// button's own listener stays for keyboard activation (Enter/Space on
-// the focused button), since it never receives real pointer clicks.
+// The invisible input intercepts every real click, including its own: on
+// desktop, clicking inside a date input only focuses a segment, not the
+// picker — only its native icon does that. The display button's listener
+// stays only for keyboard activation, since real clicks never reach it.
 function openLogSessionDatePicker() {
-  var opened = false;
-  if (logSessionDateInput.showPicker) {
-    try {
-      logSessionDateInput.showPicker();
-      opened = true;
-    } catch (e) {
-      // Some mobile browsers throw here even though showPicker exists
-      // (e.g. treating this hidden proxy input as gesture-ineligible);
-      // fall through to focus() below instead of doing nothing.
-    }
-  }
-  if (!opened) {
-    logSessionDateInput.focus();
-  }
+  openNativeDatePicker(logSessionDateInput);
 }
 
 logSessionDateInput.addEventListener('click', openLogSessionDatePicker);
@@ -76,7 +60,7 @@ logSessionDateDisplayEl.addEventListener('click', openLogSessionDatePicker);
 // back to today instead of letting it stick.
 logSessionDateInput.addEventListener('change', function () {
   if (!logSessionDateInput.value) {
-    logSessionDateInput.valueAsDate = new Date();
+    logSessionDateInput.value = formatDateOnly(new Date());
   }
   updateLogSessionDateDisplay();
 });
@@ -110,7 +94,7 @@ function openLogSessionScreen() {
   logSessionEditingSessionId = null;
   logSessionTitleEl.textContent = 'New Session';
   logSessionErrorEl.textContent = '';
-  logSessionDateInput.valueAsDate = new Date();
+  logSessionDateInput.value = formatDateOnly(new Date());
   updateLogSessionDateDisplay();
   logSessionNotesInput.innerHTML = '';
   renderTraineeSelectOptions(currentTraineeId);

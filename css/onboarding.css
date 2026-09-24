@@ -1,4 +1,4 @@
-/* Onboarding screen. The name/email fields reuse settings.css's shared
+/* Onboarding screen. The name/email fields reuse theme.css's shared
    .modal-input widget class rather than duplicating it. */
 
 /* Sits inside a .screen-header, same as every other screen's title, so the

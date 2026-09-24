@@ -14,6 +14,7 @@ var APP_SHELL = [
     "css/onboarding.css",
     "css/log-session.css",
     "css/history.css",
+    "css/rich-text.css",
     "css/nav.css",
     "js/state.js",
     "js/theme.js",

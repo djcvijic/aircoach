@@ -43,34 +43,3 @@
     opacity: 0.01;
     cursor: pointer;
 }
-
-.rich-text-toolbar {
-    display: flex;
-    gap: 4px;
-    margin-top: 4px;
-    margin-bottom: 8px;
-}
-
-.rich-text-tool {
-    background: none;
-    border: 2px solid #ccc;
-    border-radius: 6px;
-    padding: 6px 10px;
-    color: #666;
-    cursor: pointer;
-}
-
-.rich-text-tool:hover {
-    border-color: #0099ff;
-    color: #0099ff;
-}
-
-.rich-text-input {
-    min-height: 120px;
-    text-align: left;
-}
-
-.rich-text-input:empty:before {
-    content: attr(data-placeholder);
-    color: #999;
-}
