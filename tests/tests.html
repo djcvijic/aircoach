@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>aircoach tests</title>
+    <style>
+        body {
+            font-family: monospace;
+            font-size: 13px;
+            padding: 16px;
+            background: #fff;
+            color: #111;
+        }
+
+        h1 {
+            font-size: 18px;
+        }
+
+        h2 {
+            font-size: 14px;
+            margin-top: 24px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+
+        #summary {
+            font-weight: bold;
+            font-size: 15px;
+            margin: 12px 0;
+            padding: 8px;
+        }
+
+        #summary.pass {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        #summary.fail {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .test-row {
+            padding: 2px 0;
+            white-space: pre-wrap;
+        }
+
+        .test-row.pass {
+            color: #155724;
+        }
+
+        .test-row.fail {
+            color: #721c24;
+            font-weight: bold;
+        }
+
+        #app-frame {
+            width: 390px;
+            height: 700px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>aircoach test suite</h1>
+    <div id="summary">running…</div>
+    <iframe id="app-frame" src="about:blank"></iframe>
+    <div id="results"></div>
+
+    <script>
+        // Each script is independently cached, so a reload alone doesn't
+        // guarantee fresh files. document.write cache-busts them while
+        // preserving load order, same as static script tags.
+        var testScriptCacheBust = Date.now() + "_" + Math.random().toString(36).slice(2, 8);
+        [
+            "runner.js",
+            "helpers.js",
+            "logic.test.js",
+            "onboarding.test.js",
+            "trainees.test.js",
+            "trainee.test.js",
+            "log-session.test.js",
+            "history.test.js",
+            "settings.test.js",
+            "nav.test.js"
+        ].forEach(function (src) {
+            document.write('<script src="' + src + '?v=' + testScriptCacheBust + '"><\/script>');
+        });
+    </script>
+    <script>
+        // The app under test registers a cache-first service worker. Any
+        // registration left over from manually using the app in this same
+        // browser would otherwise serve stale JS/HTML to every test.
+        //
+        // A leftover service worker isn't the only staleness risk: Chrome's
+        // plain HTTP disk cache survives unregistering one. If another
+        // project was ever served from this same origin, its same-named
+        // files can still be cached and served here with no error.
+        // Force-refresh every asset index.html references, parsed from
+        // index.html itself so the list can't go stale, before any test
+        // loads the app.
+        Promise.resolve()
+            .then(function () {
+                if (!("serviceWorker" in navigator)) {
+                    return;
+                }
+                return navigator.serviceWorker.getRegistrations().then(function (regs) {
+                    return Promise.all(regs.map(function (r) { return r.unregister(); }));
+                });
+            })
+            .then(function () {
+                if (!("caches" in window)) {
+                    return;
+                }
+                return caches.keys().then(function (keys) {
+                    return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                });
+            })
+            .then(function () {
+                var indexUrl = new URL("../index.html", location.href);
+                return fetch(indexUrl, { cache: "reload" })
+                    .then(function (r) { return r.text(); })
+                    .then(function (html) {
+                        var doc = new DOMParser().parseFromString(html, "text/html");
+                        var assetUrls = [];
+                        doc.querySelectorAll("script[src], link[href]").forEach(function (el) {
+                            var attr = el.hasAttribute("src") ? "src" : "href";
+                            assetUrls.push(new URL(el.getAttribute(attr), indexUrl));
+                        });
+                        return Promise.all(assetUrls.map(function (u) {
+                            return fetch(u, { cache: "reload" });
+                        }));
+                    });
+            })
+            .then(runTests);
+    </script>
+</body>
+
+</html>
