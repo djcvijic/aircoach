@@ -141,14 +141,13 @@ function saveTrainee() {
 }
 
 function openDeleteTraineeModal() {
-  openModal(document.getElementById('delete-trainee-modal'));
+  openDeleteConfirmModal('Delete this trainee?', 'This permanently erases their sessions. This cannot be undone.', handleDeleteTraineeConfirm);
 }
 
 function handleDeleteTraineeConfirm() {
   if (!currentTraineeId) return;
   deleteTrainee(currentTraineeId);
   currentTraineeId = null;
-  closeModals();
   renderTrainees();
   showScreen(document.getElementById('trainees-screen'));
   showToast('Trainee deleted');

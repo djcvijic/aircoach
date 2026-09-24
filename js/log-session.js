@@ -13,6 +13,7 @@ var logSessionDateInput = document.getElementById('log-session-date-input');
 var logSessionTraineeSelect = document.getElementById('log-session-trainee-select');
 var logSessionNotesInput = document.getElementById('log-session-notes-input');
 var logSessionErrorEl = document.getElementById('log-session-error');
+var logSessionDeleteButton = document.getElementById('delete-session-button');
 var logSessionUnsavedModal = document.getElementById('unsaved-modal');
 
 // Non-null while editing an existing session (set by openEditSessionScreen),
@@ -94,6 +95,7 @@ function openLogSessionScreen() {
   logSessionEditingSessionId = null;
   logSessionTitleEl.textContent = 'New Session';
   logSessionErrorEl.textContent = '';
+  logSessionDeleteButton.style.display = 'none';
   logSessionDateInput.value = formatDateOnly(new Date());
   updateLogSessionDateDisplay();
   logSessionNotesInput.innerHTML = '';
@@ -112,6 +114,7 @@ function openEditSessionScreen(traineeId, sessionId) {
   logSessionEditingSessionId = sessionId;
   logSessionTitleEl.textContent = 'Edit Session';
   logSessionErrorEl.textContent = '';
+  logSessionDeleteButton.style.display = '';
   logSessionDateInput.value = session.date;
   updateLogSessionDateDisplay();
   logSessionNotesInput.innerHTML = session.notes || '';
@@ -166,4 +169,17 @@ function saveLogSession() {
   logSessionEditingSessionId = null;
 
   logSessionUnsavedGuard.resolvePending(goHome);
+}
+
+function openDeleteSessionModal() {
+  openDeleteConfirmModal('Delete this session?', 'This cannot be undone.', handleDeleteSessionConfirm);
+}
+
+function handleDeleteSessionConfirm() {
+  if (!logSessionEditingSessionId) return;
+  deleteSession(logSessionEditingTraineeId, logSessionEditingSessionId);
+  logSessionEditingTraineeId = null;
+  logSessionEditingSessionId = null;
+  showToast('Session deleted');
+  goHome();
 }

@@ -19,6 +19,15 @@ suite("log session screen: opening", function () {
         assertEqual(win.logSessionDateInput.value, todayDate());
     });
 
+    test("hides the delete icon in create mode", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var win = await freshApp({ trainees: [trainee] });
+
+        win.openLogSessionScreen();
+
+        assertEqual(win.logSessionDeleteButton.style.display, "none");
+    });
+
     test("preselects the current trainee when one is already set", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
         var win = await freshApp({ trainees: [trainee] });
@@ -125,6 +134,17 @@ suite("log session screen: editing", function () {
         assertEqual(win.logSessionNotesInput.innerHTML, "Prior notes");
     });
 
+    test("shows the delete icon in edit mode", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var session = baseSession({});
+        trainee.sessions = [session];
+        var win = await freshApp({ trainees: [trainee] });
+
+        win.openEditSessionScreen(trainee.id, session.id);
+
+        assertNotEqual(win.logSessionDeleteButton.style.display, "none");
+    });
+
     test("saving updates the session in place, keeping its id and createdAt", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
         var session = baseSession({ date: "2026-02-14", notes: "Prior notes", createdAt: 555 });
@@ -207,5 +227,52 @@ suite("log session screen: editing", function () {
 
         assertTrue(isActive(win.document.getElementById("trainees-screen")));
         assertTrue(isHidden(win.document.getElementById("unsaved-modal")));
+    });
+});
+
+suite("log session screen: deleting", function () {
+    test("clicking delete opens a confirmation modal", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var session = baseSession({});
+        trainee.sessions = [session];
+        var win = await freshApp({ trainees: [trainee] });
+        win.openEditSessionScreen(trainee.id, session.id);
+
+        win.document.getElementById("delete-session-button").click();
+
+        assertFalse(isHidden(win.document.getElementById("delete-confirm-modal")));
+    });
+
+    test("confirming permanently removes the session (hard delete, not soft), returns home, and shows a toast", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var keep = baseSession({});
+        var remove = baseSession({});
+        trainee.sessions = [keep, remove];
+        var win = await freshApp({ trainees: [trainee] });
+        win.openEditSessionScreen(trainee.id, remove.id);
+        win.openDeleteSessionModal();
+
+        win.document.getElementById("delete-confirm-button").click();
+
+        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+        var remaining = win.findTrainee(trainee.id).sessions;
+        assertEqual(remaining.length, 1);
+        assertEqual(remaining[0].id, keep.id);
+        assertTrue(win.toastEl.textContent.length > 0);
+    });
+
+    test("unsaved edits are discarded on delete with no confirmation dialog of their own", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var session = baseSession({});
+        trainee.sessions = [session];
+        var win = await freshApp({ trainees: [trainee] });
+        win.openEditSessionScreen(trainee.id, session.id);
+        win.logSessionNotesInput.innerHTML = "unsaved edit";
+
+        win.document.getElementById("delete-session-button").click();
+        win.document.getElementById("delete-confirm-button").click();
+
+        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+        assertEqual(win.findTrainee(trainee.id).sessions.length, 0);
     });
 });

@@ -150,6 +150,15 @@ function updateSession(traineeId, sessionId, data) {
   saveState();
 }
 
+// Hard delete, unlike deleteTrainee: a session has no soft-delete/recovery
+// story of its own, it just belongs to a trainee that might have one.
+function deleteSession(traineeId, sessionId) {
+  var trainee = findTrainee(traineeId);
+  if (!trainee) return;
+  trainee.sessions = trainee.sessions.filter(function (s) { return s.id !== sessionId; });
+  saveState();
+}
+
 // Generic screen/modal show-hide helpers. No app-specific logic, shared
 // here (rather than duplicated per screen file) because every screen and
 // every modal needs them, and no single screen file owns them.

@@ -218,7 +218,7 @@ suite("trainee screen: edit mode", function () {
         win.openTrainee(trainee.id);
 
         win.openDeleteTraineeModal();
-        win.document.getElementById("delete-trainee-confirm-button").click();
+        win.document.getElementById("delete-confirm-button").click();
 
         assertTrue(isActive(win.document.getElementById("trainees-screen")));
         assertEqual(win.currentTraineeId, null);

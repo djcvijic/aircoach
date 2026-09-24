@@ -26,6 +26,19 @@ function openNativeDatePicker(inputEl) {
   }
 }
 
+// The one shared "Delete this?" confirm modal (#delete-confirm-modal) is
+// used by every screen's own delete flow (trainee.js, log-session.js);
+// title/description are filled in per call, and this tracks which action
+// to actually run if Delete is confirmed.
+var activeDeleteAction = null;
+
+function openDeleteConfirmModal(title, description, onConfirm) {
+  document.getElementById('delete-confirm-title').textContent = title;
+  document.getElementById('delete-confirm-description').textContent = description;
+  activeDeleteAction = onConfirm;
+  openModal(document.getElementById('delete-confirm-modal'));
+}
+
 function goHome() {
   currentTraineeId = null;
   renderTrainees();
@@ -83,11 +96,20 @@ function main() {
   document.getElementById('trainee-cancel-button').addEventListener('click', backFromTrainee);
   document.getElementById('trainee-save-button').addEventListener('click', saveTrainee);
   document.getElementById('delete-trainee-button').addEventListener('click', openDeleteTraineeModal);
-  document.getElementById('delete-trainee-confirm-button').addEventListener('click', handleDeleteTraineeConfirm);
 
   document.getElementById('log-session-back-button').addEventListener('click', backFromLogSession);
   document.getElementById('log-session-cancel-button').addEventListener('click', backFromLogSession);
   document.getElementById('log-session-save-button').addEventListener('click', saveLogSession);
+  document.getElementById('delete-session-button').addEventListener('click', openDeleteSessionModal);
+
+  document.getElementById('delete-confirm-button').addEventListener('click', function () {
+    closeModals();
+    if (activeDeleteAction) {
+      var action = activeDeleteAction;
+      activeDeleteAction = null;
+      action();
+    }
+  });
 
   document.getElementById('history-back-button').addEventListener('click', backFromHistory);
   historyModeButtons.forEach(function (button) {
@@ -126,6 +148,7 @@ function main() {
       activeUnsavedGuard.clearPending();
       activeUnsavedGuard = null;
     }
+    activeDeleteAction = null;
     closeModals();
   }
 
