@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>aircoach</title>
+    <link rel="icon" type="image/png" href="images/favicon.png" />
+    <link rel="apple-touch-icon" href="images/icon-192.png" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#0099ff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="aircoach" />
+    <link href="css/theme.css" rel="stylesheet" />
+    <link href="css/trainees.css" rel="stylesheet" />
+    <link href="css/trainee.css" rel="stylesheet" />
+    <link href="css/settings.css" rel="stylesheet" />
+    <link href="css/onboarding.css" rel="stylesheet" />
+    <link href="css/log-session.css" rel="stylesheet" />
+    <link href="css/history.css" rel="stylesheet" />
+    <link href="fontawesome/css/fontawesome.min.css" rel="stylesheet" />
+    <link href="fontawesome/css/solid.min.css" rel="stylesheet" />
+    <link href="css/nav.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body>
+    <div class="app">
+
+        <div id="onboarding-screen" class="screen">
+            <div class="screen-header">
+                <h1 class="onboarding-heading">AirCoach</h1>
+            </div>
+            <p class="screen-description">
+                AirCoach helps you track your trainees, their session history,
+                and their training plans. First, tell us who you are. You
+                can change this later in Settings.
+            </p>
+            <div class="field">
+                <label class="field-label" for="onboarding-name-input">Your name</label>
+                <input type="text" id="onboarding-name-input" class="modal-input" />
+            </div>
+            <div class="field">
+                <label class="field-label" for="onboarding-email-input">Your email</label>
+                <input type="email" id="onboarding-email-input" class="modal-input" />
+            </div>
+            <p id="onboarding-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button id="onboarding-import-button" class="btn btn-secondary-pink" type="button">Import</button>
+                <button id="onboarding-continue-button" class="btn btn-primary" type="button">Continue</button>
+            </div>
+        </div>
+
+        <div id="trainees-screen" class="screen">
+            <div class="app-header">
+                <div class="app-name">AirCoach</div>
+            </div>
+            <div class="search-field">
+                <i class="fa-solid fa-magnifying-glass search-field-icon"></i>
+                <input type="text" id="trainees-search-input" class="modal-input trainees-search" placeholder="Search" />
+            </div>
+            <div id="trainees-list" class="trainees-list"></div>
+            <p id="trainees-empty" class="screen-description">No trainees yet. Add your first one to get started.</p>
+            <button id="add-trainee-button" class="add-trainee-button" type="button">+ New Trainee</button>
+        </div>
+
+        <div id="log-session-screen" class="screen">
+            <div class="screen-header">
+                <button id="log-session-back-button" class="btn btn-text back-button" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div id="log-session-title" class="screen-title">New Session</div>
+            </div>
+            <div class="field log-session-date-field">
+                <button type="button" id="log-session-date-display" class="log-session-date-display">
+                    <span id="log-session-date-text"></span>
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+                <input type="date" id="log-session-date-input" class="log-session-date-input" tabindex="-1" />
+            </div>
+            <div class="field">
+                <select id="log-session-trainee-select" class="modal-input">
+                    <option value="" disabled selected>Select trainee</option>
+                </select>
+            </div>
+            <div class="field">
+                <div class="rich-text-toolbar">
+                    <button class="rich-text-tool" type="button" data-command="bold" title="Bold" aria-label="Bold">
+                        <i class="fa-solid fa-bold"></i>
+                    </button>
+                    <button class="rich-text-tool" type="button" data-command="italic" title="Italic" aria-label="Italic">
+                        <i class="fa-solid fa-italic"></i>
+                    </button>
+                    <button class="rich-text-tool" type="button" data-command="insertUnorderedList" title="Bullet list" aria-label="Bullet list">
+                        <i class="fa-solid fa-list-ul"></i>
+                    </button>
+                </div>
+                <div id="log-session-notes-input" class="modal-input rich-text-input" contenteditable="true" data-placeholder="Session notes"></div>
+            </div>
+            <p id="log-session-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button id="log-session-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
+                <button id="log-session-save-button" class="btn btn-primary" type="button">Save</button>
+            </div>
+        </div>
+
+        <div id="history-screen" class="screen">
+            <div class="screen-header">
+                <button id="history-back-button" class="btn btn-text back-button" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div class="screen-title">History</div>
+            </div>
+            <div class="history-mode-row">
+                <span class="history-mode-label">Group by:</span>
+                <div id="history-mode-switch" class="history-mode-switch segmented-toggle">
+                    <button type="button" class="history-mode-option segmented-toggle-option" data-mode="date">Date</button>
+                    <button type="button" class="history-mode-option segmented-toggle-option" data-mode="trainee">Trainee</button>
+                    <div class="history-mode-thumb segmented-toggle-thumb"></div>
+                </div>
+            </div>
+            <p id="history-empty" class="screen-description">No sessions logged yet.</p>
+            <div id="history-list" class="history-list"></div>
+        </div>
+
+        <div id="trainee-screen" class="screen">
+            <div class="screen-header">
+                <button id="back-to-trainees-button" class="btn btn-text back-button" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div id="trainee-title" class="screen-title"></div>
+            </div>
+
+            <div id="trainee-history-row" class="field trainee-history-field">
+                <button type="button" id="trainee-history-link" class="btn btn-secondary">
+                    Session History <i class="fa-solid fa-list-check"></i>
+                </button>
+            </div>
+
+            <div class="field">
+                <input type="text" id="trainee-name-input" class="modal-input" placeholder="Name" />
+            </div>
+            <div class="field">
+                <select id="trainee-gender-input" class="modal-input">
+                    <option value="">Gender</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                    <option value="other">Other</option>
+                    <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+            </div>
+            <div class="field trainee-dob-field">
+                <button type="button" id="trainee-dob-display" class="modal-input trainee-dob-display"></button>
+                <input type="date" id="trainee-dob-input" class="trainee-dob-input" tabindex="-1" />
+            </div>
+            <div class="field">
+                <input type="tel" id="trainee-phone-input" class="modal-input" placeholder="Phone number" />
+            </div>
+            <div class="field">
+                <input type="email" id="trainee-email-input" class="modal-input" placeholder="Email" />
+            </div>
+            <div id="trainee-plan-field" class="field">
+                <div class="rich-text-toolbar">
+                    <button class="rich-text-tool" type="button" data-command="bold" title="Bold" aria-label="Bold">
+                        <i class="fa-solid fa-bold"></i>
+                    </button>
+                    <button class="rich-text-tool" type="button" data-command="italic" title="Italic" aria-label="Italic">
+                        <i class="fa-solid fa-italic"></i>
+                    </button>
+                    <button class="rich-text-tool" type="button" data-command="insertUnorderedList" title="Bullet list" aria-label="Bullet list">
+                        <i class="fa-solid fa-list-ul"></i>
+                    </button>
+                </div>
+                <div id="trainee-plan-input" class="modal-input rich-text-input" contenteditable="true" data-placeholder="Training plan"></div>
+            </div>
+            <p id="trainee-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button type="button" id="delete-trainee-button" class="trainee-delete-icon" aria-label="Delete trainee">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+                <button type="button" id="trainee-cancel-button" class="btn btn-secondary-pink">Cancel</button>
+                <button type="button" id="trainee-save-button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+
+        <div id="settings-screen" class="screen">
+            <div class="screen-header">
+                <button id="settings-back-button" class="btn btn-text back-button" type="button">
+                    <i class="fa-solid fa-angle-left"></i>Back
+                </button>
+                <div class="screen-title">Settings</div>
+            </div>
+            <div class="field">
+                <label class="field-label" for="settings-name-input">Your name</label>
+                <input type="text" id="settings-name-input" class="modal-input" />
+            </div>
+            <div class="field">
+                <label class="field-label" for="settings-email-input">Your email</label>
+                <input type="email" id="settings-email-input" class="modal-input" />
+            </div>
+            <p id="settings-error" class="modal-error"></p>
+            <div class="screen-actions">
+                <button id="settings-cancel-button" class="btn btn-secondary-pink" type="button">Cancel</button>
+                <button id="settings-apply-button" class="btn btn-primary" type="button">Apply</button>
+            </div>
+            <div class="settings-danger-zone">
+                <div class="settings-data-actions">
+                    <button id="export-data-button" class="btn btn-secondary" type="button">Export</button>
+                    <button id="import-data-button" class="btn btn-secondary" type="button">Import</button>
+                    <input type="file" id="import-file-input" accept="application/json" />
+                </div>
+                <button id="delete-all-data-button" class="btn btn-danger" type="button">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Delete all my data
+                </button>
+            </div>
+        </div>
+
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <div id="delete-trainee-modal" class="modal hidden">
+                <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                <div class="modal-title">Delete this trainee?</div>
+                <div class="modal-description">This permanently erases their sessions. This cannot be undone.</div>
+                <div class="modal-actions">
+                    <button id="delete-trainee-confirm-button" class="btn btn-danger" type="button">Delete</button>
+                </div>
+            </div>
+
+            <div id="unsaved-modal" class="modal hidden">
+                <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                <div class="modal-title">Unapplied changes</div>
+                <div class="modal-description">
+                    You have changes that haven't been applied yet.
+                </div>
+                <div class="modal-actions">
+                    <button id="unsaved-back-button" class="btn btn-secondary-pink" type="button">Back</button>
+                    <button id="unsaved-discard-button" class="btn btn-primary" type="button">Discard</button>
+                </div>
+            </div>
+
+            <div id="delete-all-confirm-modal" class="modal hidden">
+                <button class="modal-close" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                <div class="modal-title">Delete all data?</div>
+                <div class="modal-description">
+                    This permanently erases your name, email, and every trainee's sessions. This cannot be undone.
+                </div>
+                <div class="modal-actions">
+                    <button id="delete-all-confirm-button" class="btn btn-danger delete-confirm-button" type="button">
+                        <span class="delete-confirm-fill"></span>
+                        <span class="delete-confirm-label">Hold to delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="bottom-nav" class="bottom-nav">
+        <div class="bottom-nav-row">
+            <button id="nav-home-button" class="btn btn-text" type="button" title="Home">
+                <i class="fa-solid fa-users"></i>
+            </button>
+            <button id="nav-log-session-button" class="btn btn-text" type="button" title="New session">
+                <i class="fa-solid fa-calendar-plus"></i>
+            </button>
+            <button id="nav-history-button" class="btn btn-text" type="button" title="History">
+                <i class="fa-solid fa-list-check"></i>
+            </button>
+            <button id="nav-settings-button" class="btn btn-text" type="button" title="Settings">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="to-top"><i class="fa-solid fa-angle-up"></i> Back to top</div>
+    <div id="toast" class="toast"></div>
+    <script src="js/state.js" type="application/javascript"></script>
+    <script src="js/theme.js" type="application/javascript"></script>
+    <script src="js/trainees.js" type="application/javascript"></script>
+    <script src="js/trainee.js" type="application/javascript"></script>
+    <script src="js/settings.js" type="application/javascript"></script>
+    <script src="js/onboarding.js" type="application/javascript"></script>
+    <script src="js/log-session.js" type="application/javascript"></script>
+    <script src="js/history.js" type="application/javascript"></script>
+    <script src="js/debug.js" type="application/javascript"></script>
+    <script src="js/main.js" type="application/javascript"></script>
+</body>
+
+</html>

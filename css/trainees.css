@@ -1,0 +1,119 @@
+/* Half theme.css's default 48px: the trainees screen has real content
+   right below the header, unlike a branded welcome screen. */
+.app-header {
+    margin-bottom: 24px;
+}
+
+.search-field {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-field-icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
+}
+
+.trainees-search {
+    display: block;
+    padding-left: 40px;
+}
+
+.trainees-list {
+    display: grid;
+    gap: 12px;
+}
+
+.trainee-card {
+    display: flex;
+    align-items: stretch;
+    height: 72px;
+    background-color: white;
+    border: 2px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 150ms;
+}
+
+.trainee-card:hover {
+    border-color: #0099ff;
+}
+
+.trainee-card-avatar-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 8px 16px 16px;
+    background: none;
+    border: none;
+    color: #0099ff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.trainee-card-avatar-button:hover {
+    background-color: #e6f6ff;
+}
+
+.trainee-card-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 20px 0 8px;
+    cursor: pointer;
+}
+
+.trainee-card-name {
+    font-weight: bold;
+    font-size: 18px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.trainee-card-session-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    background: none;
+    border: none;
+    border-left: 2px solid #eee;
+    color: #0099ff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.trainee-card-session-button:hover {
+    background-color: #e6f6ff;
+}
+
+.add-trainee-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 72px;
+    margin-top: 12px;
+    background-color: transparent;
+    border: 2px dashed #CD2553;
+    border-radius: 8px;
+    padding: 0 20px;
+    color: #CD2553;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 150ms;
+}
+
+.add-trainee-button:hover {
+    background-color: #fbe6ec;
+}
