@@ -159,12 +159,6 @@ function deleteSession(traineeId, sessionId) {
   saveState();
 }
 
-// Generic screen/modal show-hide helpers. No app-specific logic, shared
-// here (rather than duplicated per screen file) because every screen and
-// every modal needs them, and no single screen file owns them.
-var modalOverlay = document.getElementById('modal-overlay');
-var bottomNavEl = document.getElementById('bottom-nav');
-
 // Screens with no entry here (onboarding, trainee-screen) just leave every
 // nav button unhighlighted, since neither has one of its own: trainee-screen
 // is a drill-down from trainees-screen, not a direct nav destination.
@@ -176,49 +170,9 @@ var NAV_BUTTON_ID_BY_SCREEN_ID = {
 };
 
 function showScreen(screen) {
-  document.querySelectorAll('.screen').forEach(function (s) {
-    s.classList.remove('active');
+  setActiveScreen(screen, NAV_BUTTON_ID_BY_SCREEN_ID, function () {
+    return !!appState.trainerName;
   });
-  screen.classList.add('active');
-
-  var showBottomNav = !!appState.trainerName;
-  bottomNavEl.style.display = showBottomNav ? '' : 'none';
-  document.body.classList.toggle('no-bottom-nav', !showBottomNav);
-  document.body.classList.toggle('history-screen-active', screen.id === 'history-screen');
-
-  setActiveNavButton(NAV_BUTTON_ID_BY_SCREEN_ID[screen.id]);
-
-  window.scrollTo(0, 0);
+  document.body.classList.toggle('show-to-top', screen.id === 'history-screen');
 }
 
-function pad2(n) {
-  return n < 10 ? '0' + n : '' + n;
-}
-
-function formatDateOnly(date) {
-  return date.getFullYear() + '-' + pad2(date.getMonth() + 1) + '-' + pad2(date.getDate());
-}
-
-// A session's date is "YYYY-MM-DD"; parsing that directly via `new
-// Date(string)` reads it as UTC, which can roll it back a day in
-// negative-UTC timezones. Parse the components explicitly instead.
-function parseDateOnly(value) {
-  var parts = value.split('-');
-  return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-}
-
-function formatDayHeader(date) {
-  return date.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' });
-}
-
-function openModal(modal) {
-  modalOverlay.classList.remove('hidden');
-  modal.classList.remove('hidden');
-}
-
-function closeModals() {
-  modalOverlay.classList.add('hidden');
-  document.querySelectorAll('.modal').forEach(function (modal) {
-    modal.classList.add('hidden');
-  });
-}

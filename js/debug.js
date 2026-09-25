@@ -20,21 +20,6 @@ var DEBUG_TRAINING_PLANS = [
 
 var DEBUG_GENDERS = ['female', 'male', 'other', ''];
 
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function shuffled(array) {
-  var copy = array.slice();
-  for (var i = copy.length - 1; i > 0; i--) {
-    var j = randomInt(0, i);
-    var temp = copy[i];
-    copy[i] = copy[j];
-    copy[j] = temp;
-  }
-  return copy;
-}
-
 function randomPastDate(daysBack) {
   var date = new Date();
   date.setDate(date.getDate() - randomInt(0, daysBack));

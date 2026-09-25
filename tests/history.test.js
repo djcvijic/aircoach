@@ -5,7 +5,7 @@ suite("history screen: empty and defaults", function () {
         win.openHistoryScreen();
 
         assertTrue(win.document.getElementById("history-empty").textContent.indexOf("No sessions") !== -1);
-        assertEqual(win.document.querySelectorAll(".history-group").length, 0);
+        assertEqual(win.document.querySelectorAll(".collapsible-group").length, 0);
     });
 
     test("opens in date mode by default, regardless of what mode was last used", async function () {
@@ -40,7 +40,7 @@ suite("history screen: date mode", function () {
 
         win.openHistoryScreen("date");
 
-        var titles = Array.from(win.document.querySelectorAll(".history-group-title")).map(function (el) { return el.textContent; });
+        var titles = Array.from(win.document.querySelectorAll(".collapsible-group-title")).map(function (el) { return el.textContent; });
         assertEqual(titles.length, 2);
         assertEqual(titles[0], win.formatDayHeader(win.parseDateOnly(daysAgoDate(1))));
         assertEqual(titles[1], win.formatDayHeader(win.parseDateOnly(daysAgoDate(5))));
@@ -64,7 +64,7 @@ suite("history screen: date mode", function () {
 
         win.openHistoryScreen("date");
 
-        assertFalse(win.document.querySelector(".history-group").classList.contains("collapsed"));
+        assertFalse(win.document.querySelector(".collapsible-group").classList.contains("collapsed"));
     });
 
     test("excludes sessions belonging to a soft-deleted trainee", async function () {
@@ -73,19 +73,19 @@ suite("history screen: date mode", function () {
 
         win.openHistoryScreen("date");
 
-        assertEqual(win.document.querySelectorAll(".history-group").length, 0);
+        assertEqual(win.document.querySelectorAll(".collapsible-group").length, 0);
     });
 
     test("clicking a group header toggles its collapsed state", async function () {
         var trainee = baseTrainee({ name: "Jamie", sessions: [baseSession({})] });
         var win = await freshApp({ trainees: [trainee] });
         win.openHistoryScreen("date");
-        var group = win.document.querySelector(".history-group");
+        var group = win.document.querySelector(".collapsible-group");
 
-        group.querySelector(".history-group-header").click();
+        group.querySelector(".collapsible-group-header").click();
         assertTrue(group.classList.contains("collapsed"));
 
-        group.querySelector(".history-group-header").click();
+        group.querySelector(".collapsible-group-header").click();
         assertFalse(group.classList.contains("collapsed"));
     });
 
@@ -120,7 +120,7 @@ suite("history screen: trainee mode", function () {
 
         win.openHistoryScreen("trainee");
 
-        var titles = Array.from(win.document.querySelectorAll(".history-group-title")).map(function (el) { return el.textContent; });
+        var titles = Array.from(win.document.querySelectorAll(".collapsible-group-title")).map(function (el) { return el.textContent; });
         assertArrayEqual(titles, ["Busy"]);
     });
 
@@ -130,7 +130,7 @@ suite("history screen: trainee mode", function () {
 
         win.openHistoryScreen("trainee");
 
-        assertTrue(win.document.querySelector(".history-group").classList.contains("collapsed"));
+        assertTrue(win.document.querySelector(".collapsible-group").classList.contains("collapsed"));
     });
 
     test("a trainee's own sessions are sorted by date descending", async function () {
@@ -141,7 +141,7 @@ suite("history screen: trainee mode", function () {
         var win = await freshApp({ trainees: [trainee] });
 
         win.openHistoryScreen("trainee");
-        var group = win.document.querySelector(".history-group");
+        var group = win.document.querySelector(".collapsible-group");
         group.classList.remove("collapsed");
 
         var dates = Array.from(group.querySelectorAll(".history-session-primary")).map(function (el) { return el.textContent; });

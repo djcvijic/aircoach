@@ -6,26 +6,6 @@
 // buttons know which guard to resolve.
 var activeUnsavedGuard = null;
 
-// Shared by every native date field's overlay input and decorative display
-// button (log-session.js, trainee.js): a plain click inside a date input
-// only focuses a segment, not the picker, so showPicker() is needed instead.
-function openNativeDatePicker(inputEl) {
-  var opened = false;
-  if (inputEl.showPicker) {
-    try {
-      inputEl.showPicker();
-      opened = true;
-    } catch (e) {
-      // Some mobile browsers throw here even though showPicker exists
-      // (e.g. treating this hidden proxy input as gesture-ineligible);
-      // fall through to focus() below instead of doing nothing.
-    }
-  }
-  if (!opened) {
-    inputEl.focus();
-  }
-}
-
 // The one shared "Delete this?" confirm modal (#delete-confirm-modal) is
 // used by every screen's own delete flow (trainee.js, log-session.js);
 // title/description are filled in per call, and this tracks which action
@@ -134,14 +114,6 @@ function main() {
   document.getElementById('export-data-button').addEventListener('click', exportData);
   document.getElementById('import-data-button').addEventListener('click', openImportPicker);
   document.getElementById('delete-all-data-button').addEventListener('click', openDeleteAllConfirmModal);
-  deleteAllConfirmButton.addEventListener('mousedown', startDeleteHold);
-  deleteAllConfirmButton.addEventListener('touchstart', startDeleteHold);
-  deleteAllConfirmButton.addEventListener('mouseup', cancelDeleteHold);
-  deleteAllConfirmButton.addEventListener('mouseleave', cancelDeleteHold);
-  deleteAllConfirmButton.addEventListener('touchend', cancelDeleteHold);
-  deleteAllConfirmButton.addEventListener('contextmenu', function (e) {
-    e.preventDefault();
-  });
 
   function dismissModals() {
     if (activeUnsavedGuard) {
@@ -167,32 +139,9 @@ function main() {
     if (e.target === modalOverlay) dismissModals();
   });
 
-  document.addEventListener('keydown', function (e) {
-    if (e.altKey && e.metaKey && (e.code === 'KeyR' || e.key.toLowerCase() === 'r')) {
-      e.preventDefault();
-      fillRandomDebugData();
-      return;
-    }
-
-    if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) {
-      dismissModals();
-    }
-  });
+  wireGlobalShortcuts(fillRandomDebugData, dismissModals);
 
   boot();
 }
 
 document.addEventListener('DOMContentLoaded', main);
-
-// Skipped on localhost: the service worker is cache-first, so during local
-// dev it would keep serving pre-edit files after every change instead of
-// the fresh ones, unless CACHE_NAME is bumped on every single edit.
-if (location.hostname !== 'localhost' && 'serviceWorker' in navigator) {
-  window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js');
-  });
-}
-
-if (navigator.storage && navigator.storage.persist) {
-  navigator.storage.persist();
-}

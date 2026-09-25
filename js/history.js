@@ -3,7 +3,6 @@
 // home screen). Styled after airbudget's own history (detail) screen.
 
 var historyScreen = document.getElementById('history-screen');
-var historyModeSwitch = document.getElementById('history-mode-switch');
 var historyModeButtons = document.querySelectorAll('.history-mode-option');
 var historyListEl = document.getElementById('history-list');
 var historyEmptyEl = document.getElementById('history-empty');
@@ -91,52 +90,12 @@ function buildHistorySessionRow(entry, primaryText) {
   return row;
 }
 
-// Collapsible group, mirroring airbudget's detail-group: clicking the
-// header toggles a "collapsed" class that CSS uses to hide the body.
 function buildHistoryGroup(title, sessionCount, collapsed, elementId) {
-  var groupEl = document.createElement('div');
-  groupEl.className = 'history-group' + (collapsed ? ' collapsed' : '');
-  if (elementId) {
-    groupEl.id = elementId;
-  }
-
-  var header = document.createElement('button');
-  header.type = 'button';
-  header.className = 'history-group-header';
-  header.addEventListener('click', function () {
-    groupEl.classList.toggle('collapsed');
-  });
-
-  var titleEl = document.createElement('span');
-  titleEl.className = 'history-group-title';
-
-  var chevronEl = document.createElement('i');
-  chevronEl.className = 'fa-solid fa-angle-right history-group-chevron';
-
-  var titleTextEl = document.createElement('span');
-  titleTextEl.textContent = title;
-
-  titleEl.appendChild(chevronEl);
-  titleEl.appendChild(titleTextEl);
-
   var countEl = document.createElement('span');
-  countEl.className = 'history-group-count';
+  countEl.className = 'collapsible-group-count';
   countEl.textContent = sessionCount + ' session' + (sessionCount === 1 ? '' : 's');
 
-  header.appendChild(titleEl);
-  header.appendChild(countEl);
-
-  var bodyWrapper = document.createElement('div');
-  bodyWrapper.className = 'history-group-body';
-
-  var body = document.createElement('div');
-  body.className = 'history-group-body-inner';
-  bodyWrapper.appendChild(body);
-
-  groupEl.appendChild(header);
-  groupEl.appendChild(bodyWrapper);
-
-  return { el: groupEl, body: body };
+  return buildCollapsibleGroup(title, countEl, collapsed, elementId);
 }
 
 function renderByDate(entries) {
@@ -183,7 +142,6 @@ function renderByTrainee() {
 }
 
 function renderHistoryView() {
-  historyModeSwitch.dataset.mode = historyMode;
   historyModeButtons.forEach(function (button) {
     button.classList.toggle('selected', button.dataset.mode === historyMode);
   });

@@ -10,8 +10,6 @@ var APP_SHELL = [
     "css/theme.css",
     "css/trainees.css",
     "css/trainee.css",
-    "css/settings.css",
-    "css/onboarding.css",
     "css/log-session.css",
     "css/history.css",
     "css/main.css",

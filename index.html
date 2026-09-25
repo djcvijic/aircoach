@@ -15,8 +15,6 @@
     <link href="css/theme.css" rel="stylesheet" />
     <link href="css/trainees.css" rel="stylesheet" />
     <link href="css/trainee.css" rel="stylesheet" />
-    <link href="css/settings.css" rel="stylesheet" />
-    <link href="css/onboarding.css" rel="stylesheet" />
     <link href="css/log-session.css" rel="stylesheet" />
     <link href="css/history.css" rel="stylesheet" />
     <link href="fontawesome/css/fontawesome.min.css" rel="stylesheet" />
@@ -115,16 +113,16 @@
                 </button>
                 <div class="screen-title">History</div>
             </div>
-            <div class="history-mode-row">
-                <span class="history-mode-label">Group by:</span>
-                <div id="history-mode-switch" class="history-mode-switch segmented-toggle">
+            <div class="toggle-row">
+                <span class="toggle-row-label">Group by:</span>
+                <div class="segmented-toggle segmented-toggle-2">
                     <button type="button" class="history-mode-option segmented-toggle-option" data-mode="date">Date</button>
                     <button type="button" class="history-mode-option segmented-toggle-option" data-mode="trainee">Trainee</button>
                     <div class="history-mode-thumb segmented-toggle-thumb"></div>
                 </div>
             </div>
             <p id="history-empty" class="screen-description">No sessions logged yet.</p>
-            <div id="history-list" class="history-list"></div>
+            <div id="history-list" class="collapsible-group-list"></div>
         </div>
 
         <div id="trainee-screen" class="screen">
