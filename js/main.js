@@ -55,6 +55,8 @@ function goToScreen(navigateFn) {
 }
 
 function main() {
+  initInstallPrompt('AirCoach');
+
   document.getElementById('onboarding-continue-button').addEventListener('click', applyOnboarding);
   document.getElementById('onboarding-import-button').addEventListener('click', openImportPicker);
 

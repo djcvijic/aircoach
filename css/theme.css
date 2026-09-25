@@ -279,9 +279,6 @@ body.no-bottom-nav .app {
     font-weight: bold;
 }
 
-/* Collapsible group: a header (chevron + title + trailing content) that
-   toggles a "collapsed" class on the group element on click; the body's
-   grid-template-rows animates open/shut off that class. */
 .collapsible-group-list {
     display: flex;
     flex-direction: column;
@@ -332,6 +329,8 @@ body.no-bottom-nav .app {
     color: #666;
 }
 
+/* Animates open/shut via grid-template-rows (1fr/0fr) instead of height,
+   since height:auto can't be transitioned. */
 .collapsible-group-body {
     display: grid;
     grid-template-rows: 1fr;
@@ -404,10 +403,7 @@ body.no-bottom-nav .app {
     background-color: #111;
 }
 
-/* #import-file-input is a hidden proxy, triggered via .click() instead of
-   shown to the user. The delete button needs a press-and-hold confirm
-   (theme.js's createHoldToConfirm) rather than a plain click since delete
-   is irreversible. */
+/* Hidden proxy, triggered via .click() instead of shown to the user. */
 #import-file-input {
     display: none;
 }
@@ -428,6 +424,8 @@ body.no-bottom-nav .app {
     text-align: right;
 }
 
+/* Needs a press-and-hold confirm (theme.js's createHoldToConfirm) rather
+   than a plain click, since delete is irreversible. */
 .delete-confirm-button {
     position: relative;
     overflow: hidden;

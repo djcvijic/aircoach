@@ -55,10 +55,9 @@ function createUnsavedGuard(hasChangesFn, modalEl) {
     };
 }
 
-// Press-and-hold confirm control, for actions too destructive for a plain
-// click: holding buttonEl for holdMs fills it (CSS's .holding class), then
-// calls onConfirm. ?testMode=1 skips the hold and confirms immediately, so
-// tests don't have to wait it out.
+// Press-and-hold confirm for actions too destructive for a plain click.
+// ?testMode=1 skips the hold and confirms immediately, so tests don't have
+// to wait it out.
 function createHoldToConfirm(buttonEl, modalEl, onConfirm, holdMs) {
     var TEST_MODE = new URLSearchParams(location.search).has("testMode");
     holdMs = holdMs || 2000;
@@ -191,6 +190,94 @@ function wireGlobalShortcuts(onDebugHotkey, dismissModals) {
             dismissModals();
         }
     });
+}
+
+// Exempts the app from iOS Safari's 7-day storage-eviction timer, not just
+// a convenience. Chrome/Android get a real install button via
+// beforeinstallprompt; iOS has no such API, so it gets instructions instead.
+// Prepended outside the .screen system, so it stays visible across every
+// screen, including onboarding, until dismissed or installed.
+function initInstallPrompt(appName) {
+    var DISMISSED_KEY = "install-banner-dismissed";
+    var isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    var deferredPrompt = null;
+
+    var bannerEl = document.createElement("div");
+    bannerEl.className = "banner";
+
+    var textEl = document.createElement("span");
+    textEl.className = "banner-text";
+
+    var actionButton = document.createElement("button");
+    actionButton.type = "button";
+    actionButton.className = "btn btn-text banner-action";
+    actionButton.textContent = "Install";
+
+    var dismissButton = document.createElement("button");
+    dismissButton.type = "button";
+    dismissButton.className = "btn btn-text banner-dismiss";
+    dismissButton.setAttribute("aria-label", "Dismiss install banner");
+
+    var dismissIcon = document.createElement("i");
+    dismissIcon.className = "fa-solid fa-xmark";
+    dismissButton.appendChild(dismissIcon);
+
+    bannerEl.appendChild(textEl);
+    bannerEl.appendChild(actionButton);
+    bannerEl.appendChild(dismissButton);
+    document.querySelector(".app").prepend(bannerEl);
+
+    function isAppInstalled() {
+        return window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    }
+
+    function updateBanner() {
+        if (isAppInstalled() || localStorage.getItem(DISMISSED_KEY)) {
+            bannerEl.style.display = "none";
+            return;
+        }
+
+        if (isIOSDevice) {
+            textEl.textContent = "Install " + appName + ": tap the Share icon, then \"Add to Home Screen\".";
+            actionButton.style.display = "none";
+            bannerEl.style.display = "flex";
+        } else if (deferredPrompt) {
+            textEl.textContent = "Install " + appName + " for quick access and offline use.";
+            actionButton.style.display = "";
+            bannerEl.style.display = "flex";
+        } else {
+            bannerEl.style.display = "none";
+        }
+    }
+
+    actionButton.addEventListener("click", function () {
+        if (!deferredPrompt) {
+            return;
+        }
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function () {
+            deferredPrompt = null;
+        });
+    });
+
+    dismissButton.addEventListener("click", function () {
+        localStorage.setItem(DISMISSED_KEY, "1");
+        bannerEl.style.display = "none";
+    });
+
+    window.addEventListener("beforeinstallprompt", function (e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        updateBanner();
+    });
+
+    window.addEventListener("appinstalled", function () {
+        deferredPrompt = null;
+        bannerEl.style.display = "none";
+    });
+
+    updateBanner();
 }
 
 // Toggling "collapsed" here drives theme.css's chevron-rotate/body-collapse
