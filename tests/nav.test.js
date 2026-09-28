@@ -93,3 +93,17 @@ suite("bottom nav: active state", function () {
         });
     });
 });
+
+suite("bottom nav: repeat clicks", function () {
+    test("clicking the nav button for the screen already showing does nothing", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var win = await freshApp({ trainees: [trainee] });
+        win.openLogSessionScreen();
+        win.logSessionNotesInput.innerHTML = "should survive a repeat click";
+
+        win.document.getElementById("nav-log-session-button").click();
+
+        assertTrue(isActive(win.logSessionScreen));
+        assertEqual(win.logSessionNotesInput.innerHTML, "should survive a repeat click");
+    });
+});

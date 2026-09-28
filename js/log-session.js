@@ -138,11 +138,16 @@ function goFromLogSession(navigateFn) {
 }
 
 function backFromLogSession() {
+  var wasEditing = !!logSessionEditingSessionId;
   goFromLogSession(function () {
     currentTraineeId = null;
     logSessionEditingTraineeId = null;
     logSessionEditingSessionId = null;
-    showScreen(document.getElementById('trainees-screen'));
+    if (wasEditing) {
+      refreshHistoryScreen();
+    } else {
+      showScreen(document.getElementById('trainees-screen'));
+    }
   });
 }
 
@@ -165,6 +170,8 @@ function saveLogSession() {
     notes: logSessionNotesInput.innerHTML.trim()
   };
 
+  var wasEditing = !!logSessionEditingSessionId;
+
   if (logSessionEditingSessionId) {
     updateSession(logSessionEditingTraineeId, logSessionEditingSessionId, sessionData);
     showToast('Session updated');
@@ -176,7 +183,7 @@ function saveLogSession() {
   logSessionEditingTraineeId = null;
   logSessionEditingSessionId = null;
 
-  logSessionUnsavedGuard.resolvePending(goHome);
+  logSessionUnsavedGuard.resolvePending(wasEditing ? refreshHistoryScreen : goHome);
 }
 
 function openDeleteSessionModal() {
@@ -189,5 +196,5 @@ function handleDeleteSessionConfirm() {
   logSessionEditingTraineeId = null;
   logSessionEditingSessionId = null;
   showToast('Session deleted');
-  goHome();
+  refreshHistoryScreen();
 }

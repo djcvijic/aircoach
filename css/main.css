@@ -40,7 +40,7 @@
 /* Aircoach-only override of theme.css's .btn-text size, kept out of the
    shared theme file. */
 .bottom-nav-row .btn-text {
-    width: 48px;
-    height: 48px;
-    font-size: 24px;
+    width: 52px;
+    height: 52px;
+    font-size: 26px;
 }

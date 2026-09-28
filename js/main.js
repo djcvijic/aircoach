@@ -44,7 +44,7 @@ var unsavedGuardsByScreen = [
 
 function goToScreen(navigateFn) {
   var active = unsavedGuardsByScreen.find(function (entry) {
-    return entry.screen.classList.contains('active');
+    return entry.screen.id === currentScreenId;
   });
   if (active) {
     activeUnsavedGuard = active.guard;
@@ -60,18 +60,10 @@ function main() {
   document.getElementById('onboarding-continue-button').addEventListener('click', applyOnboarding);
   document.getElementById('onboarding-import-button').addEventListener('click', openImportPicker);
 
-  document.getElementById('nav-home-button').addEventListener('click', function () {
-    goToScreen(goHome);
-  });
-  document.getElementById('nav-log-session-button').addEventListener('click', function () {
-    goToScreen(openLogSessionScreen);
-  });
-  document.getElementById('nav-history-button').addEventListener('click', function () {
-    goToScreen(openHistoryScreen);
-  });
-  document.getElementById('nav-settings-button').addEventListener('click', function () {
-    goToScreen(openSettingsScreen);
-  });
+  wireNavButton('nav-home-button', 'trainees-screen', function () { goToScreen(goHome); });
+  wireNavButton('nav-log-session-button', 'log-session-screen', function () { goToScreen(openLogSessionScreen); });
+  wireNavButton('nav-history-button', 'history-screen', function () { goToScreen(openHistoryScreen); });
+  wireNavButton('nav-settings-button', 'settings-screen', function () { goToScreen(openSettingsScreen); });
 
   document.getElementById('add-trainee-button').addEventListener('click', openNewTraineeScreen);
   document.getElementById('back-to-trainees-button').addEventListener('click', backFromTrainee);

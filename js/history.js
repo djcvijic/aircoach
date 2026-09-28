@@ -9,6 +9,10 @@ var historyEmptyEl = document.getElementById('history-empty');
 
 var historyMode = 'date';
 
+// Set only when opened via the trainee screen's "Session History" link, so
+// Back can return there instead of always going home.
+var historyReturnTraineeId = null;
+
 function allSessionsWithTrainee() {
   var entries = [];
   activeTrainees().forEach(function (trainee) {
@@ -159,11 +163,13 @@ function renderHistoryView() {
   }
 }
 
-// mode is optional, defaulting to date grouping; scrollToTraineeId is only
-// meaningful with trainee grouping, and expands + scrolls to that trainee's
-// group once rendered (used by the trainee screen's "See History" link).
+// mode is optional, defaulting to date grouping. scrollToTraineeId expands
+// + scrolls to that trainee's group, and sets where Back returns to —
+// both only apply when opened from the trainee screen's Session History
+// link.
 function openHistoryScreen(mode, scrollToTraineeId) {
   historyMode = mode || 'date';
+  historyReturnTraineeId = scrollToTraineeId || null;
   showScreen(historyScreen);
   renderHistoryView();
 
@@ -176,6 +182,14 @@ function openHistoryScreen(mode, scrollToTraineeId) {
   }
 }
 
+// Re-renders in place, unlike openHistoryScreen, so a session-edit round
+// trip doesn't reset historyReturnTraineeId and lose the trainee screen
+// further back in the chain.
+function refreshHistoryScreen() {
+  showScreen(historyScreen);
+  renderHistoryView();
+}
+
 function setHistoryMode(mode) {
   if (mode === historyMode) return;
   historyMode = mode;
@@ -183,5 +197,11 @@ function setHistoryMode(mode) {
 }
 
 function backFromHistory() {
-  goHome();
+  if (historyReturnTraineeId) {
+    var traineeId = historyReturnTraineeId;
+    historyReturnTraineeId = null;
+    openTrainee(traineeId);
+  } else {
+    goHome();
+  }
 }

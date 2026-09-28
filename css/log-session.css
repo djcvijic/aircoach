@@ -41,15 +41,47 @@
     cursor: pointer;
 }
 
-/* Reuses theme.css's collapsible-group mechanics for the notes field, but
-   history.css's blue .collapsible-group-title and the generic header's
-   divider line don't belong on a plain field label, so both are undone
-   here, scoped to this one field. */
-#log-session-notes-group .collapsible-group-header {
-    border-bottom: none;
-    padding-bottom: 0;
+/* Own classes, not theme.css's collapsible-group — every screen's markup
+   stays in the DOM at once, so those classes would leak into
+   history.test.js's document-wide queries. */
+.log-session-notes-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: none;
+    border: none;
+    font: inherit;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 8px;
 }
 
-#log-session-notes-group .collapsible-group-title {
-    color: inherit;
+.log-session-notes-chevron {
+    flex-shrink: 0;
+    color: #666;
+    transition: transform 200ms ease;
+}
+
+#log-session-notes-group:not(.collapsed) .log-session-notes-chevron {
+    transform: rotate(90deg);
+}
+
+.log-session-notes-body {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 200ms ease;
+}
+
+#log-session-notes-group.collapsed .log-session-notes-body {
+    grid-template-rows: 0fr;
+}
+
+.log-session-notes-body-inner {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
 }

@@ -162,6 +162,35 @@ suite("history screen: trainee mode", function () {
         var otherGroup = win.document.getElementById("history-trainee-" + other.id);
         assertTrue(otherGroup.classList.contains("collapsed"));
     });
+
+    test("Back after opening from the trainee screen's Session History link returns to that trainee screen", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera", sessions: [baseSession({})] });
+        var win = await freshApp({ trainees: [trainee] });
+
+        win.openHistoryScreen("trainee", trainee.id);
+        win.backFromHistory();
+
+        assertTrue(isActive(win.traineeScreen));
+        assertEqual(win.currentTraineeId, trainee.id);
+    });
+
+    test("editing a session from a trainee-scoped history view and backing out twice still returns to the trainee screen", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var session = baseSession({});
+        trainee.sessions = [session];
+        var win = await freshApp({ trainees: [trainee] });
+
+        win.openHistoryScreen("trainee", trainee.id);
+        win.openEditSessionScreen(trainee.id, session.id);
+        win.backFromLogSession();
+
+        assertTrue(isActive(win.historyScreen));
+
+        win.backFromHistory();
+
+        assertTrue(isActive(win.traineeScreen));
+        assertEqual(win.currentTraineeId, trainee.id);
+    });
 });
 
 suite("history screen: mode switch", function () {

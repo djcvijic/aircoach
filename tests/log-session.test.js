@@ -180,6 +180,30 @@ suite("log session screen: editing", function () {
         assertEqual(moved.createdAt, 777);
     });
 
+    test("saving returns to history, not home", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var session = baseSession({});
+        trainee.sessions = [session];
+        var win = await freshApp({ trainees: [trainee] });
+        win.openEditSessionScreen(trainee.id, session.id);
+
+        win.saveLogSession();
+
+        assertTrue(isActive(win.historyScreen));
+    });
+
+    test("Back with no changes returns to history, not home", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var session = baseSession({});
+        trainee.sessions = [session];
+        var win = await freshApp({ trainees: [trainee] });
+        win.openEditSessionScreen(trainee.id, session.id);
+
+        win.backFromLogSession();
+
+        assertTrue(isActive(win.historyScreen));
+    });
+
     test("unsaved changes on Back/Cancel open a confirmation instead of leaving", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
         var win = await freshApp({ trainees: [trainee] });
@@ -243,7 +267,7 @@ suite("log session screen: deleting", function () {
         assertFalse(isHidden(win.document.getElementById("delete-confirm-modal")));
     });
 
-    test("confirming permanently removes the session (hard delete, not soft), returns home, and shows a toast", async function () {
+    test("confirming permanently removes the session (hard delete, not soft), returns to history, and shows a toast", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
         var keep = baseSession({});
         var remove = baseSession({});
@@ -254,7 +278,7 @@ suite("log session screen: deleting", function () {
 
         win.document.getElementById("delete-confirm-button").click();
 
-        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+        assertTrue(isActive(win.document.getElementById("history-screen")));
         var remaining = win.findTrainee(trainee.id).sessions;
         assertEqual(remaining.length, 1);
         assertEqual(remaining[0].id, keep.id);
@@ -272,7 +296,7 @@ suite("log session screen: deleting", function () {
         win.document.getElementById("delete-session-button").click();
         win.document.getElementById("delete-confirm-button").click();
 
-        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+        assertTrue(isActive(win.document.getElementById("history-screen")));
         assertEqual(win.findTrainee(trainee.id).sessions.length, 0);
     });
 });
