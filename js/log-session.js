@@ -12,6 +12,8 @@ var logSessionDateTextEl = document.getElementById('log-session-date-text');
 var logSessionDateInput = document.getElementById('log-session-date-input');
 var logSessionTraineeSelect = document.getElementById('log-session-trainee-select');
 var logSessionNotesInput = document.getElementById('log-session-notes-input');
+var logSessionNotesGroupEl = document.getElementById('log-session-notes-group');
+var logSessionNotesToggle = document.getElementById('log-session-notes-toggle');
 var logSessionErrorEl = document.getElementById('log-session-error');
 var logSessionDeleteButton = document.getElementById('delete-session-button');
 var logSessionUnsavedModal = document.getElementById('unsaved-modal');
@@ -52,6 +54,10 @@ function updateLogSessionDateDisplay() {
 function openLogSessionDatePicker() {
   openNativeDatePicker(logSessionDateInput);
 }
+
+logSessionNotesToggle.addEventListener('click', function () {
+  logSessionNotesGroupEl.classList.toggle('collapsed');
+});
 
 logSessionDateInput.addEventListener('click', openLogSessionDatePicker);
 logSessionDateDisplayEl.addEventListener('click', openLogSessionDatePicker);
@@ -99,6 +105,7 @@ function openLogSessionScreen() {
   logSessionDateInput.value = formatDateOnly(new Date());
   updateLogSessionDateDisplay();
   logSessionNotesInput.innerHTML = '';
+  logSessionNotesGroupEl.classList.add('collapsed');
   renderTraineeSelectOptions(currentTraineeId);
   logSessionOriginal = captureLogSessionSnapshot();
 
@@ -118,6 +125,7 @@ function openEditSessionScreen(traineeId, sessionId) {
   logSessionDateInput.value = session.date;
   updateLogSessionDateDisplay();
   logSessionNotesInput.innerHTML = session.notes || '';
+  logSessionNotesGroupEl.classList.toggle('collapsed', !session.notes);
   renderTraineeSelectOptions(traineeId);
   logSessionOriginal = captureLogSessionSnapshot();
 

@@ -40,3 +40,16 @@
     opacity: 0.01;
     cursor: pointer;
 }
+
+/* Reuses theme.css's collapsible-group mechanics for the notes field, but
+   history.css's blue .collapsible-group-title and the generic header's
+   divider line don't belong on a plain field label, so both are undone
+   here, scoped to this one field. */
+#log-session-notes-group .collapsible-group-header {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+#log-session-notes-group .collapsible-group-title {
+    color: inherit;
+}

@@ -83,18 +83,30 @@
                 </select>
             </div>
             <div class="field">
-                <div class="rich-text-toolbar">
-                    <button class="rich-text-tool" type="button" data-command="bold" title="Bold" aria-label="Bold">
-                        <i class="fa-solid fa-bold"></i>
+                <div id="log-session-notes-group" class="collapsible-group collapsed">
+                    <button type="button" id="log-session-notes-toggle" class="collapsible-group-header">
+                        <span class="collapsible-group-title">
+                            <i class="fa-solid fa-angle-right collapsible-group-chevron"></i>
+                            <span>Daily notes (optional)</span>
+                        </span>
                     </button>
-                    <button class="rich-text-tool" type="button" data-command="italic" title="Italic" aria-label="Italic">
-                        <i class="fa-solid fa-italic"></i>
-                    </button>
-                    <button class="rich-text-tool" type="button" data-command="insertUnorderedList" title="Bullet list" aria-label="Bullet list">
-                        <i class="fa-solid fa-list-ul"></i>
-                    </button>
+                    <div class="collapsible-group-body">
+                        <div class="collapsible-group-body-inner">
+                            <div class="rich-text-toolbar">
+                                <button class="rich-text-tool" type="button" data-command="bold" title="Bold" aria-label="Bold">
+                                    <i class="fa-solid fa-bold"></i>
+                                </button>
+                                <button class="rich-text-tool" type="button" data-command="italic" title="Italic" aria-label="Italic">
+                                    <i class="fa-solid fa-italic"></i>
+                                </button>
+                                <button class="rich-text-tool" type="button" data-command="insertUnorderedList" title="Bullet list" aria-label="Bullet list">
+                                    <i class="fa-solid fa-list-ul"></i>
+                                </button>
+                            </div>
+                            <div id="log-session-notes-input" class="modal-input rich-text-input" contenteditable="true" data-placeholder="e.g. something specific to note about this session"></div>
+                        </div>
+                    </div>
                 </div>
-                <div id="log-session-notes-input" class="modal-input rich-text-input" contenteditable="true" data-placeholder="Session notes"></div>
             </div>
             <p id="log-session-error" class="modal-error"></p>
             <div class="screen-actions">
@@ -162,6 +174,7 @@
                 <input type="email" id="trainee-email-input" class="modal-input" placeholder="Email" />
             </div>
             <div id="trainee-plan-field" class="field">
+                <label class="field-label" for="trainee-plan-input">Training plan</label>
                 <div class="rich-text-toolbar">
                     <button class="rich-text-tool" type="button" data-command="bold" title="Bold" aria-label="Bold">
                         <i class="fa-solid fa-bold"></i>
@@ -173,7 +186,7 @@
                         <i class="fa-solid fa-list-ul"></i>
                     </button>
                 </div>
-                <div id="trainee-plan-input" class="modal-input rich-text-input" contenteditable="true" data-placeholder="Training plan"></div>
+                <div id="trainee-plan-input" class="modal-input rich-text-input" contenteditable="true" data-placeholder="e.g. this month's focus, phases, or long-term goals"></div>
             </div>
             <p id="trainee-error" class="modal-error"></p>
             <div class="screen-actions">
