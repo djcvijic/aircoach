@@ -46,6 +46,11 @@ function renderTrainees() {
     name.textContent = trainee.name;
     info.appendChild(name);
 
+    var sessionCount = document.createElement('div');
+    sessionCount.className = 'trainee-card-session-count';
+    sessionCount.textContent = trainee.sessions.length + ' session' + (trainee.sessions.length === 1 ? '' : 's');
+    info.appendChild(sessionCount);
+
     info.addEventListener('click', openThisTrainee);
     card.appendChild(info);
 

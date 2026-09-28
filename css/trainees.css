@@ -78,6 +78,12 @@
     overflow: hidden;
 }
 
+.trainee-card-session-count {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #666;
+}
+
 .trainee-card-session-button {
     display: flex;
     align-items: center;

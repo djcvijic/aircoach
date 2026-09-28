@@ -39,6 +39,16 @@ suite("trainees screen", function () {
         assertTrue(win.document.getElementById("trainees-empty").textContent.indexOf("No trainees match") !== -1);
     });
 
+    test("shows each trainee's total session count, singular and plural", async function () {
+        var none = baseTrainee({ name: "None", sessions: [] });
+        var one = baseTrainee({ name: "One", sessions: [baseSession({})] });
+        var many = baseTrainee({ name: "Many", sessions: [baseSession({}), baseSession({}), baseSession({})] });
+        var win = await freshApp({ trainees: [none, one, many] });
+
+        var counts = Array.from(win.document.querySelectorAll(".trainee-card-session-count")).map(function (el) { return el.textContent; });
+        assertArrayEqual(counts, ["3 sessions", "1 session", "0 sessions"]);
+    });
+
     test("clicking a trainee's info opens the trainee screen prefilled for editing", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
         var win = await freshApp({ trainees: [trainee] });
