@@ -1,5 +1,37 @@
-.trainee-history-field {
+.view-trainee-session-count {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #666;
+}
+
+.view-trainee-row {
+    margin-bottom: 16px;
+}
+
+.view-trainee-label {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.view-trainee-value {
+    font-size: 16px;
+    overflow-wrap: break-word;
+}
+
+.view-trainee-value a {
+    color: #0099ff;
+}
+
+.view-trainee-history-field {
     text-align: center;
+    margin-bottom: 24px;
+}
+
+.view-trainee-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
 }
 
 .trainee-dob-field {

@@ -1,9 +1,8 @@
 suite("trainee screen: create mode", function () {
-    test("hides the history link, delete icon, and training plan field", async function () {
+    test("hides the delete icon and training plan field", async function () {
         var win = await freshApp({});
         win.openNewTraineeScreen();
 
-        assertEqual(win.traineeHistoryRowEl.style.display, "none");
         assertEqual(win.traineeDeleteButton.style.display, "none");
         assertEqual(win.traineePlanFieldEl.style.display, "none");
     });
@@ -87,13 +86,12 @@ suite("trainee screen: edit mode", function () {
         assertEqual(win.traineePlanInput.innerHTML, "Solo cross-country prep");
     });
 
-    test("shows the history link, delete icon, and training plan field", async function () {
+    test("shows the delete icon and training plan field", async function () {
         var trainee = seededTrainee();
         var win = await freshApp({ trainees: [trainee] });
 
         win.openTrainee(trainee.id);
 
-        assertNotEqual(win.traineeHistoryRowEl.style.display, "none");
         assertNotEqual(win.traineeDeleteButton.style.display, "none");
         assertNotEqual(win.traineePlanFieldEl.style.display, "none");
     });
@@ -122,7 +120,7 @@ suite("trainee screen: edit mode", function () {
 
         win.saveTrainee();
 
-        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+        assertTrue(isActive(win.viewTraineeScreen));
         assertEqual(win.appState.trainees.length, 1);
         var updated = win.appState.trainees[0];
         assertEqual(updated.id, trainee.id);
@@ -166,49 +164,19 @@ suite("trainee screen: edit mode", function () {
 
         win.document.getElementById("unsaved-discard-button").click();
 
-        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+        assertTrue(isActive(win.viewTraineeScreen));
         assertEqual(win.appState.trainees[0].name, "Jamie Rivera");
     });
 
-    test("Back with no changes leaves immediately with no confirmation", async function () {
+    test("Back with no changes returns to that trainee's View screen", async function () {
         var trainee = seededTrainee();
         var win = await freshApp({ trainees: [trainee] });
         win.openTrainee(trainee.id);
 
         win.backFromTrainee();
 
-        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+        assertTrue(isActive(win.viewTraineeScreen));
         assertTrue(isHidden(win.document.getElementById("unsaved-modal")));
-    });
-
-    test("the Session History link opens History in trainee mode, expanded and scrolled to this trainee", async function () {
-        var trainee = seededTrainee();
-        trainee.sessions = [baseSession({})];
-        var win = await freshApp({ trainees: [trainee] });
-        win.openTrainee(trainee.id);
-
-        win.document.getElementById("trainee-history-link").click();
-
-        assertTrue(isActive(win.historyScreen));
-        assertEqual(win.historyMode, "trainee");
-        var group = win.document.getElementById("history-trainee-" + trainee.id);
-        assertTrue(group !== null);
-        assertFalse(group.classList.contains("collapsed"));
-    });
-
-    test("the Session History link is guarded by unsaved changes, and Discard proceeds to History (not just home)", async function () {
-        var trainee = seededTrainee();
-        var win = await freshApp({ trainees: [trainee] });
-        win.openTrainee(trainee.id);
-        setValue(win.traineeNameInput, "Changed Name");
-
-        win.document.getElementById("trainee-history-link").click();
-        assertTrue(isActive(win.traineeScreen), "navigation is blocked until the warning is resolved");
-
-        win.document.getElementById("unsaved-discard-button").click();
-
-        assertTrue(isActive(win.historyScreen));
-        assertEqual(win.historyMode, "trainee");
     });
 
     test("deleting soft-deletes the trainee and hides them and their sessions everywhere", async function () {
@@ -229,5 +197,133 @@ suite("trainee screen: edit mode", function () {
         assertEqual(stillInStorage.deleted, true);
         assertEqual(win.findTrainee(trainee.id), null);
         assertEqual(win.document.querySelectorAll(".trainee-card").length, 0);
+    });
+});
+
+suite("view trainee screen", function () {
+    function seededTrainee() {
+        return baseTrainee({
+            name: "Jamie Rivera",
+            gender: "female",
+            dob: "1990-05-20",
+            phone: "555-1234",
+            email: "jamie@example.com",
+            trainingPlan: "Solo cross-country prep"
+        });
+    }
+
+    test("shows every filled-in field", async function () {
+        var trainee = seededTrainee();
+        var win = await freshApp({ trainees: [trainee] });
+
+        win.openViewTraineeScreen(trainee.id);
+
+        assertEqual(win.viewTraineeTitleEl.textContent, "Jamie Rivera");
+        assertEqual(win.viewTraineeGenderEl.textContent, "Female");
+        assertEqual(win.viewTraineePhoneEl.textContent, "555-1234");
+        assertEqual(win.viewTraineeEmailEl.textContent, "jamie@example.com");
+        assertEqual(win.viewTraineePlanEl.innerHTML, "Solo cross-country prep");
+    });
+
+    test("hides rows for fields the trainee has no value for", async function () {
+        var trainee = baseTrainee({ name: "No Details" });
+        var win = await freshApp({ trainees: [trainee] });
+
+        win.openViewTraineeScreen(trainee.id);
+
+        assertEqual(win.viewTraineeGenderRowEl.style.display, "none");
+        assertEqual(win.viewTraineeDobRowEl.style.display, "none");
+        assertEqual(win.viewTraineePhoneRowEl.style.display, "none");
+        assertEqual(win.viewTraineeEmailRowEl.style.display, "none");
+        assertEqual(win.viewTraineePlanFieldEl.style.display, "none");
+    });
+
+    test("hides the Session History button when there are zero sessions, shows it otherwise", async function () {
+        var empty = baseTrainee({ name: "Empty", sessions: [] });
+        var busy = baseTrainee({ name: "Busy", sessions: [baseSession({})] });
+        var win = await freshApp({ trainees: [empty, busy] });
+
+        win.openViewTraineeScreen(empty.id);
+        assertEqual(win.viewTraineeHistoryFieldEl.style.display, "none");
+
+        win.openViewTraineeScreen(busy.id);
+        assertNotEqual(win.viewTraineeHistoryFieldEl.style.display, "none");
+    });
+
+    test("shows the total session count, singular and plural", async function () {
+        var none = baseTrainee({ name: "None", sessions: [] });
+        var one = baseTrainee({ name: "One", sessions: [baseSession({})] });
+        var win = await freshApp({ trainees: [none, one] });
+
+        win.openViewTraineeScreen(none.id);
+        assertEqual(win.viewTraineeSessionCountEl.textContent, "0 sessions");
+
+        win.openViewTraineeScreen(one.id);
+        assertEqual(win.viewTraineeSessionCountEl.textContent, "1 session");
+    });
+
+    test("Back returns home", async function () {
+        var trainee = seededTrainee();
+        var win = await freshApp({ trainees: [trainee] });
+        win.openViewTraineeScreen(trainee.id);
+
+        win.backFromViewTrainee();
+
+        assertTrue(isActive(win.document.getElementById("trainees-screen")));
+    });
+
+    test("the Edit button opens the trainee screen prefilled for editing", async function () {
+        var trainee = seededTrainee();
+        var win = await freshApp({ trainees: [trainee] });
+        win.openViewTraineeScreen(trainee.id);
+
+        win.document.getElementById("view-trainee-edit-button").click();
+
+        assertTrue(isActive(win.traineeScreen));
+        assertEqual(win.traineeNameInput.value, "Jamie Rivera");
+    });
+
+    test("the Session History button opens History in trainee mode, expanded and scrolled to this trainee", async function () {
+        var trainee = seededTrainee();
+        trainee.sessions = [baseSession({})];
+        var win = await freshApp({ trainees: [trainee] });
+        win.openViewTraineeScreen(trainee.id);
+
+        win.document.getElementById("view-trainee-history-button").click();
+
+        assertTrue(isActive(win.historyScreen));
+        assertEqual(win.historyMode, "trainee");
+        var group = win.document.getElementById("history-trainee-" + trainee.id);
+        assertTrue(group !== null);
+        assertFalse(group.classList.contains("collapsed"));
+    });
+
+    test("the Add Session button opens New Session with this trainee preselected", async function () {
+        var trainee = seededTrainee();
+        var win = await freshApp({ trainees: [trainee] });
+        win.openViewTraineeScreen(trainee.id);
+
+        win.document.getElementById("view-trainee-add-session-button").click();
+
+        assertTrue(isActive(win.logSessionScreen));
+        assertEqual(win.logSessionTitleEl.textContent, "New Session");
+        assertEqual(win.logSessionTraineeSelect.value, trainee.id);
+    });
+
+    test("Back/Save from an Add Session opened this way return to the View screen, not home", async function () {
+        var trainee = seededTrainee();
+        var win = await freshApp({ trainees: [trainee] });
+        win.openViewTraineeScreen(trainee.id);
+        win.document.getElementById("view-trainee-add-session-button").click();
+
+        win.backFromLogSession();
+
+        assertTrue(isActive(win.viewTraineeScreen));
+        assertEqual(win.currentTraineeId, trainee.id);
+
+        win.document.getElementById("view-trainee-add-session-button").click();
+        win.saveLogSession();
+
+        assertTrue(isActive(win.viewTraineeScreen));
     });
 });

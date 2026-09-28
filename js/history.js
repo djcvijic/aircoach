@@ -165,8 +165,8 @@ function renderHistoryView() {
 
 // mode is optional, defaulting to date grouping. scrollToTraineeId expands
 // + scrolls to that trainee's group, and sets where Back returns to —
-// both only apply when opened from the trainee screen's Session History
-// link.
+// both only apply when opened from the View Trainee screen's Session
+// History button.
 function openHistoryScreen(mode, scrollToTraineeId) {
   historyMode = mode || 'date';
   historyReturnTraineeId = scrollToTraineeId || null;
@@ -200,7 +200,7 @@ function backFromHistory() {
   if (historyReturnTraineeId) {
     var traineeId = historyReturnTraineeId;
     historyReturnTraineeId = null;
-    openTrainee(traineeId);
+    openViewTraineeScreen(traineeId);
   } else {
     goHome();
   }

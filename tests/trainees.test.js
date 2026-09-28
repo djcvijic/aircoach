@@ -49,14 +49,24 @@ suite("trainees screen", function () {
         assertArrayEqual(counts, ["3 sessions", "1 session", "0 sessions"]);
     });
 
-    test("clicking a trainee's info opens the trainee screen prefilled for editing", async function () {
+    test("clicking a trainee's info opens the View Trainee screen for that trainee", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
         var win = await freshApp({ trainees: [trainee] });
 
         win.document.querySelector(".trainee-card-info").click();
 
-        assertTrue(isActive(win.traineeScreen));
-        assertEqual(win.traineeNameInput.value, "Jamie Rivera");
+        assertTrue(isActive(win.viewTraineeScreen));
+        assertEqual(win.viewTraineeTitleEl.textContent, "Jamie Rivera");
+        assertEqual(win.currentTraineeId, trainee.id);
+    });
+
+    test("clicking a trainee's avatar also opens the View Trainee screen for that trainee", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var win = await freshApp({ trainees: [trainee] });
+
+        win.document.querySelector(".trainee-card-avatar-button").click();
+
+        assertTrue(isActive(win.viewTraineeScreen));
         assertEqual(win.currentTraineeId, trainee.id);
     });
 

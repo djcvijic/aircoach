@@ -163,18 +163,18 @@ suite("history screen: trainee mode", function () {
         assertTrue(otherGroup.classList.contains("collapsed"));
     });
 
-    test("Back after opening from the trainee screen's Session History link returns to that trainee screen", async function () {
+    test("Back after opening from the View Trainee screen's Session History button returns to that View screen", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera", sessions: [baseSession({})] });
         var win = await freshApp({ trainees: [trainee] });
 
         win.openHistoryScreen("trainee", trainee.id);
         win.backFromHistory();
 
-        assertTrue(isActive(win.traineeScreen));
+        assertTrue(isActive(win.viewTraineeScreen));
         assertEqual(win.currentTraineeId, trainee.id);
     });
 
-    test("editing a session from a trainee-scoped history view and backing out twice still returns to the trainee screen", async function () {
+    test("editing a session from a trainee-scoped history view and backing out twice still returns to the View Trainee screen", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
         var session = baseSession({});
         trainee.sessions = [session];
@@ -188,7 +188,7 @@ suite("history screen: trainee mode", function () {
 
         win.backFromHistory();
 
-        assertTrue(isActive(win.traineeScreen));
+        assertTrue(isActive(win.viewTraineeScreen));
         assertEqual(win.currentTraineeId, trainee.id);
     });
 });

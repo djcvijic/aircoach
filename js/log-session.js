@@ -23,6 +23,10 @@ var logSessionUnsavedModal = document.getElementById('unsaved-modal');
 var logSessionEditingTraineeId = null;
 var logSessionEditingSessionId = null;
 
+// Set only when opened via a trainee's own Add Session button (View
+// Trainee screen), so Back/Save can return there instead of home.
+var logSessionReturnTraineeId = null;
+
 var logSessionOriginal = null;
 var logSessionUnsavedGuard = createUnsavedGuard(hasUnsavedLogSessionChanges, logSessionUnsavedModal);
 
@@ -91,7 +95,7 @@ function renderTraineeSelectOptions(selectedTraineeId) {
   logSessionTraineeSelect.value = selectedTraineeId || '';
 }
 
-function openLogSessionScreen() {
+function openLogSessionScreen(returnTraineeId) {
   if (activeTrainees().length === 0) {
     showToast('Add a trainee first');
     return;
@@ -99,6 +103,7 @@ function openLogSessionScreen() {
 
   logSessionEditingTraineeId = null;
   logSessionEditingSessionId = null;
+  logSessionReturnTraineeId = returnTraineeId || null;
   logSessionTitleEl.textContent = 'New Session';
   logSessionErrorEl.textContent = '';
   logSessionDeleteButton.style.display = 'none';
@@ -119,6 +124,7 @@ function openEditSessionScreen(traineeId, sessionId) {
 
   logSessionEditingTraineeId = traineeId;
   logSessionEditingSessionId = sessionId;
+  logSessionReturnTraineeId = null;
   logSessionTitleEl.textContent = 'Edit Session';
   logSessionErrorEl.textContent = '';
   logSessionDeleteButton.style.display = '';
@@ -137,17 +143,30 @@ function goFromLogSession(navigateFn) {
   logSessionUnsavedGuard.goFrom(logSessionScreen, navigateFn);
 }
 
+// Editing (opened from a History row) returns to History; a new session
+// opened from a trainee's own Add Session button returns to that trainee's
+// View screen; anything else (nav bar, homescreen shortcut) goes home.
+function logSessionExitDestination() {
+  if (logSessionEditingSessionId) {
+    return refreshHistoryScreen;
+  }
+  if (logSessionReturnTraineeId) {
+    var traineeId = logSessionReturnTraineeId;
+    return function () {
+      openViewTraineeScreen(traineeId);
+    };
+  }
+  return goHome;
+}
+
 function backFromLogSession() {
-  var wasEditing = !!logSessionEditingSessionId;
+  var destination = logSessionExitDestination();
   goFromLogSession(function () {
     currentTraineeId = null;
     logSessionEditingTraineeId = null;
     logSessionEditingSessionId = null;
-    if (wasEditing) {
-      refreshHistoryScreen();
-    } else {
-      showScreen(document.getElementById('trainees-screen'));
-    }
+    logSessionReturnTraineeId = null;
+    destination();
   });
 }
 
@@ -170,7 +189,7 @@ function saveLogSession() {
     notes: logSessionNotesInput.innerHTML.trim()
   };
 
-  var wasEditing = !!logSessionEditingSessionId;
+  var destination = logSessionExitDestination();
 
   if (logSessionEditingSessionId) {
     updateSession(logSessionEditingTraineeId, logSessionEditingSessionId, sessionData);
@@ -182,8 +201,9 @@ function saveLogSession() {
 
   logSessionEditingTraineeId = null;
   logSessionEditingSessionId = null;
+  logSessionReturnTraineeId = null;
 
-  logSessionUnsavedGuard.resolvePending(wasEditing ? refreshHistoryScreen : goHome);
+  logSessionUnsavedGuard.resolvePending(destination);
 }
 
 function openDeleteSessionModal() {

@@ -25,13 +25,13 @@ function renderTrainees() {
     card.className = 'trainee-card';
 
     function openThisTrainee() {
-      openTrainee(trainee.id);
+      openViewTraineeScreen(trainee.id);
     }
 
     var avatarButton = document.createElement('button');
     avatarButton.type = 'button';
     avatarButton.className = 'trainee-card-avatar-button';
-    avatarButton.setAttribute('aria-label', 'Edit ' + trainee.name);
+    avatarButton.setAttribute('aria-label', 'View ' + trainee.name);
     var avatarIcon = document.createElement('i');
     avatarIcon.className = 'fa-solid fa-user';
     avatarButton.appendChild(avatarIcon);
