@@ -26,6 +26,7 @@ suite("date helpers", function () {
         assertTrue(text.indexOf("Jan") !== -1, "expected month abbreviation, got: " + text);
         assertTrue(text.indexOf("1") !== -1, "expected day number, got: " + text);
     });
+
 });
 
 suite("traineeFrecency", function () {
@@ -38,30 +39,30 @@ suite("traineeFrecency", function () {
 
     test("a session today contributes close to full weight", async function () {
         var win = await freshApp({});
-        var trainee = baseTrainee({ sessions: [baseSession({ date: todayDate() })] });
+        var trainee = baseTrainee({ sessions: [baseSession({ createdAt: Date.now() })] });
 
         assertClose(win.traineeFrecency(trainee), 1, 0.1);
     });
 
     test("a session one half-life ago contributes about half weight", async function () {
         var win = await freshApp({});
-        var trainee = baseTrainee({ sessions: [baseSession({ date: daysAgoDate(30) })] });
+        var trainee = baseTrainee({ sessions: [baseSession({ createdAt: daysAgoTimestamp(30) })] });
 
         assertClose(win.traineeFrecency(trainee), 0.5, 0.05);
     });
 
     test("a session far in the past contributes almost nothing", async function () {
         var win = await freshApp({});
-        var trainee = baseTrainee({ sessions: [baseSession({ date: daysAgoDate(365) })] });
+        var trainee = baseTrainee({ sessions: [baseSession({ createdAt: daysAgoTimestamp(365) })] });
 
         assertTrue(win.traineeFrecency(trainee) < 0.01);
     });
 
     test("multiple sessions sum their individual contributions", async function () {
         var win = await freshApp({});
-        var soloScore = win.traineeFrecency(baseTrainee({ sessions: [baseSession({ date: todayDate() })] }));
+        var soloScore = win.traineeFrecency(baseTrainee({ sessions: [baseSession({ createdAt: Date.now() })] }));
         var pairScore = win.traineeFrecency(baseTrainee({
-            sessions: [baseSession({ date: todayDate() }), baseSession({ date: todayDate() })]
+            sessions: [baseSession({ createdAt: Date.now() }), baseSession({ createdAt: Date.now() })]
         }));
 
         assertClose(pairScore, soloScore * 2, 0.05);
@@ -70,8 +71,8 @@ suite("traineeFrecency", function () {
 
 suite("sortedTrainees", function () {
     test("orders by frecency descending", async function () {
-        var busy = baseTrainee({ name: "Busy", sessions: [baseSession({ date: todayDate() })] });
-        var quiet = baseTrainee({ name: "Quiet", sessions: [baseSession({ date: daysAgoDate(365) })] });
+        var busy = baseTrainee({ name: "Busy", sessions: [baseSession({ createdAt: Date.now() })] });
+        var quiet = baseTrainee({ name: "Quiet", sessions: [baseSession({ createdAt: daysAgoTimestamp(365) })] });
         var win = await freshApp({ trainees: [quiet, busy] });
 
         assertArrayEqual(win.sortedTrainees().map(function (t) { return t.name; }), ["Busy", "Quiet"]);
@@ -126,29 +127,19 @@ suite("activeTrainees / findTrainee", function () {
 });
 
 suite("compareSessionsDesc", function () {
-    test("a later date sorts before an earlier one", async function () {
+    test("a later createdAt sorts before an earlier one", async function () {
         var win = await freshApp({});
-        var earlier = baseSession({ date: "2026-01-01" });
-        var later = baseSession({ date: "2026-01-02" });
+        var earlier = baseSession({ createdAt: 1000 });
+        var later = baseSession({ createdAt: 2000 });
 
         assertTrue(win.compareSessionsDesc(later, earlier) < 0);
         assertTrue(win.compareSessionsDesc(earlier, later) > 0);
     });
 
-    test("same date breaks the tie by most recently logged (higher createdAt) first", async function () {
+    test("equal createdAt is treated as a true tie", async function () {
         var win = await freshApp({});
-        var loggedFirst = baseSession({ date: "2026-01-01", createdAt: 1000 });
-        var loggedSecond = baseSession({ date: "2026-01-01", createdAt: 2000 });
-
-        assertTrue(win.compareSessionsDesc(loggedSecond, loggedFirst) < 0);
-    });
-
-    test("same date, missing createdAt on both, is treated as a true tie", async function () {
-        var win = await freshApp({});
-        var a = baseSession({ date: "2026-01-01" });
-        var b = baseSession({ date: "2026-01-01" });
-        delete a.createdAt;
-        delete b.createdAt;
+        var a = baseSession({ createdAt: 1000 });
+        var b = baseSession({ createdAt: 1000 });
 
         assertEqual(win.compareSessionsDesc(a, b), 0);
     });

@@ -13,6 +13,10 @@ var historyMode = 'date';
 // Back can return there instead of always going home.
 var historyReturnTraineeId = null;
 
+function formatTimeOfDay(date) {
+  return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+}
+
 function allSessionsWithTrainee() {
   var entries = [];
   activeTrainees().forEach(function (trainee) {
@@ -112,7 +116,7 @@ function renderByDate(entries) {
   var currentDay = null;
 
   entries.forEach(function (entry) {
-    var key = entry.session.date;
+    var key = formatDateOnly(new Date(entry.session.createdAt));
     if (key !== currentKey) {
       currentKey = key;
       currentDay = { date: parseDateOnly(key), entries: [] };
@@ -124,7 +128,8 @@ function renderByDate(entries) {
   days.forEach(function (day) {
     var group = buildHistoryGroup(formatDayHeader(day.date), day.entries.length);
     day.entries.forEach(function (entry) {
-      group.body.appendChild(buildHistorySessionRow(entry, entry.trainee.name));
+      var primaryText = entry.trainee.name + ', ' + formatTimeOfDay(new Date(entry.session.createdAt));
+      group.body.appendChild(buildHistorySessionRow(entry, primaryText));
     });
     historyListEl.appendChild(group.el);
   });
@@ -139,7 +144,9 @@ function renderByTrainee() {
     var group = buildHistoryGroup(trainee.name, sorted.length, true, 'history-trainee-' + trainee.id);
     sorted.forEach(function (session) {
       var entry = { session: session, trainee: trainee };
-      group.body.appendChild(buildHistorySessionRow(entry, formatDayHeader(parseDateOnly(session.date))));
+      var sessionDate = new Date(session.createdAt);
+      var primaryText = formatDayHeader(sessionDate) + ', ' + formatTimeOfDay(sessionDate);
+      group.body.appendChild(buildHistorySessionRow(entry, primaryText));
     });
     historyListEl.appendChild(group.el);
   });

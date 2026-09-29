@@ -26,6 +26,13 @@ function randomPastDate(daysBack) {
   return formatDateOnly(date);
 }
 
+function randomPastTimestamp(daysBack) {
+  var date = new Date();
+  date.setDate(date.getDate() - randomInt(0, daysBack));
+  date.setHours(randomInt(0, 23), randomInt(0, 59));
+  return date.getTime();
+}
+
 function fillRandomDebugData() {
   appState = defaultState();
   appState.trainerName = 'Alex Morgan';
@@ -50,9 +57,8 @@ function fillRandomDebugData() {
     for (var i = 0; i < sessionCount; i++) {
       trainee.sessions.push({
         id: makeId(),
-        date: randomPastDate(120),
         notes: DEBUG_SESSION_NOTES[randomInt(0, DEBUG_SESSION_NOTES.length - 1)],
-        createdAt: Date.now() - randomInt(0, 1000000000)
+        createdAt: randomPastTimestamp(120)
       });
     }
 

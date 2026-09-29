@@ -7,7 +7,7 @@ suite("trainees screen", function () {
     });
 
     test("lists trainees in sortedTrainees order", async function () {
-        var busy = baseTrainee({ name: "Busy", sessions: [baseSession({ date: todayDate() })] });
+        var busy = baseTrainee({ name: "Busy", sessions: [baseSession({ createdAt: Date.now() })] });
         var quiet = baseTrainee({ name: "Quiet", sessions: [] });
         var win = await freshApp({ trainees: [quiet, busy] });
 

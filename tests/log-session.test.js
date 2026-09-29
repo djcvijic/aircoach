@@ -49,7 +49,7 @@ suite("log session screen: opening", function () {
     });
 
     test("the trainee dropdown lists trainees in sortedTrainees order and excludes soft-deleted ones", async function () {
-        var busy = baseTrainee({ name: "Busy", sessions: [baseSession({ date: todayDate() })] });
+        var busy = baseTrainee({ name: "Busy", sessions: [baseSession({ createdAt: Date.now() })] });
         var quiet = baseTrainee({ name: "Quiet", sessions: [] });
         var deleted = baseTrainee({ name: "Gone", deleted: true });
         var win = await freshApp({ trainees: [quiet, deleted, busy] });
@@ -96,10 +96,25 @@ suite("log session screen: validation and saving", function () {
         assertTrue(isActive(win.document.getElementById("trainees-screen")));
         assertEqual(trainee_sessionCount(win, trainee.id), 1);
         var session = win.findTrainee(trainee.id).sessions[0];
-        assertEqual(session.date, todayDate());
+        assertEqual(win.formatDateOnly(new Date(session.createdAt)), todayDate());
         assertEqual(session.notes, "Great session");
         assertTrue(session.createdAt > 0);
         assertTrue(win.toastEl.textContent.length > 0);
+    });
+
+    test("a new session's time of day is stamped with the current time, not midnight", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var win = await freshApp({ trainees: [trainee] });
+        win.openLogSessionScreen();
+        setValue(win.logSessionTraineeSelect, trainee.id);
+
+        win.saveLogSession();
+
+        var session = win.findTrainee(trainee.id).sessions[0];
+        var savedTime = new Date(session.createdAt);
+        var now = new Date();
+        assertEqual(savedTime.getHours(), now.getHours());
+        assertClose(savedTime.getMinutes(), now.getMinutes(), 1);
     });
 
     test("clearing the date field via a real change event snaps back to today", async function () {
@@ -122,7 +137,7 @@ suite("log session screen: validation and saving", function () {
 suite("log session screen: editing", function () {
     test("prefills date, trainee, and notes from the existing session", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
-        var session = baseSession({ date: "2026-02-14", notes: "Prior notes" });
+        var session = baseSession({ createdAt: new Date(2026, 1, 14, 9, 15).getTime(), notes: "Prior notes" });
         trainee.sessions = [session];
         var win = await freshApp({ trainees: [trainee] });
 
@@ -145,22 +160,33 @@ suite("log session screen: editing", function () {
         assertNotEqual(win.logSessionDeleteButton.style.display, "none");
     });
 
-    test("saving updates the session in place, keeping its id and createdAt", async function () {
+    test("saving updates the session in place, keeping its id", async function () {
         var trainee = baseTrainee({ name: "Jamie Rivera" });
-        var session = baseSession({ date: "2026-02-14", notes: "Prior notes", createdAt: 555 });
+        var session = baseSession({ createdAt: new Date(2026, 1, 14, 9, 15).getTime(), notes: "Prior notes" });
         trainee.sessions = [session];
         var win = await freshApp({ trainees: [trainee] });
         win.openEditSessionScreen(trainee.id, session.id);
-        setValue(win.logSessionDateInput, "2026-03-01");
         win.logSessionNotesInput.innerHTML = "Updated notes";
 
         win.saveLogSession();
 
         var updated = win.findTrainee(trainee.id).sessions[0];
         assertEqual(updated.id, session.id);
-        assertEqual(updated.createdAt, 555);
-        assertEqual(updated.date, "2026-03-01");
         assertEqual(updated.notes, "Updated notes");
+    });
+
+    test("moving a session to a different day keeps its original time of day", async function () {
+        var trainee = baseTrainee({ name: "Jamie Rivera" });
+        var session = baseSession({ createdAt: new Date(2026, 1, 14, 9, 15).getTime() });
+        trainee.sessions = [session];
+        var win = await freshApp({ trainees: [trainee] });
+        win.openEditSessionScreen(trainee.id, session.id);
+
+        setValue(win.logSessionDateInput, "2026-03-01");
+        win.saveLogSession();
+
+        var updated = win.findTrainee(trainee.id).sessions[0];
+        assertEqual(updated.createdAt, new Date(2026, 2, 1, 9, 15).getTime());
     });
 
     test("saving with a different trainee selected moves the session, keeping id and createdAt", async function () {

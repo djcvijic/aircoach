@@ -49,9 +49,9 @@ function findTrainee(id) {
 var FRECENCY_HALF_LIFE_DAYS = 30;
 
 function traineeFrecency(trainee) {
-  var now = new Date();
+  var now = Date.now();
   return trainee.sessions.reduce(function (score, session) {
-    var daysAgo = (now - parseDateOnly(session.date)) / (1000 * 60 * 60 * 24);
+    var daysAgo = (now - session.createdAt) / (1000 * 60 * 60 * 24);
     return score + Math.pow(0.5, daysAgo / FRECENCY_HALF_LIFE_DAYS);
   }, 0);
 }
@@ -106,38 +106,38 @@ function deleteTrainee(id) {
   saveState();
 }
 
+// The form only collects a day; timeSource supplies the hour — now when
+// creating, the session's own original time when just moving its day.
+function combineDateWithTime(dateOnly, timeSource) {
+  var date = parseDateOnly(dateOnly);
+  date.setHours(timeSource.getHours(), timeSource.getMinutes(), timeSource.getSeconds(), timeSource.getMilliseconds());
+  return date.getTime();
+}
+
 function addSession(traineeId, data) {
   var trainee = findTrainee(traineeId);
   if (!trainee) return;
   trainee.sessions.push({
     id: makeId(),
-    date: data.date,
     notes: data.notes || '',
-    createdAt: Date.now()
+    createdAt: combineDateWithTime(data.date, new Date())
   });
   saveState();
 }
 
-// Sessions are entered as a plain date (no time-of-day), so createdAt
-// breaks ties between same-day sessions in the order they were logged,
-// giving an exact ordering instead of an arbitrary one.
 function compareSessionsDesc(a, b) {
-  if (a.date !== b.date) {
-    return a.date < b.date ? 1 : -1;
-  }
-  return (b.createdAt || 0) - (a.createdAt || 0);
+  return b.createdAt - a.createdAt;
 }
 
-// data.traineeId lets a session move to a different trainee; the session
-// keeps its id and createdAt either way, since editing isn't logging a new
-// entry.
+// data.traineeId moves a session to a different trainee, keeping its id.
+// Moving it to a different day keeps its original time of day, not "now".
 function updateSession(traineeId, sessionId, data) {
   var trainee = findTrainee(traineeId);
   if (!trainee) return;
   var session = trainee.sessions.find(function (s) { return s.id === sessionId; });
   if (!session) return;
 
-  session.date = data.date;
+  session.createdAt = combineDateWithTime(data.date, new Date(session.createdAt));
   session.notes = data.notes || '';
 
   if (data.traineeId && data.traineeId !== traineeId) {

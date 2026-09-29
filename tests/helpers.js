@@ -69,6 +69,12 @@ function daysAgoDate(n) {
     return dateOnly(d);
 }
 
+function daysAgoTimestamp(n) {
+    var d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.getTime();
+}
+
 function baseTrainee(overrides) {
     var trainee = {
         id: "trainee-" + Math.random().toString(36).slice(2, 8),
@@ -91,7 +97,6 @@ function baseTrainee(overrides) {
 function baseSession(overrides) {
     var session = {
         id: "session-" + Math.random().toString(36).slice(2, 8),
-        date: todayDate(),
         notes: "",
         createdAt: Date.now()
     };

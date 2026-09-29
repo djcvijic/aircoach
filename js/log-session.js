@@ -128,7 +128,7 @@ function openEditSessionScreen(traineeId, sessionId) {
   logSessionTitleEl.textContent = 'Edit Session';
   logSessionErrorEl.textContent = '';
   logSessionDeleteButton.style.display = '';
-  logSessionDateInput.value = session.date;
+  logSessionDateInput.value = formatDateOnly(new Date(session.createdAt));
   updateLogSessionDateDisplay();
   logSessionNotesInput.innerHTML = session.notes || '';
   logSessionNotesGroupEl.classList.toggle('collapsed', !session.notes);
