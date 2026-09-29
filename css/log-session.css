@@ -53,6 +53,7 @@
     border: none;
     font: inherit;
     font-weight: bold;
+    color: inherit;
     text-align: left;
     cursor: pointer;
     padding: 0;
