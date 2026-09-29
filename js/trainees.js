@@ -1,4 +1,5 @@
 var traineesSearchInput = document.getElementById('trainees-search-input');
+var traineesSearchField = document.querySelector('.search-field');
 traineesSearchInput.addEventListener('input', renderTrainees);
 
 function renderTrainees() {
@@ -6,15 +7,18 @@ function renderTrainees() {
   var empty = document.getElementById('trainees-empty');
   list.innerHTML = '';
 
+  var hasAnyTrainees = activeTrainees().length > 0;
+  traineesSearchField.style.display = hasAnyTrainees ? 'block' : 'none';
+
   var query = traineesSearchInput.value.toLowerCase();
   var filtered = sortedTrainees().filter(function (trainee) {
     return trainee.name.toLowerCase().indexOf(query) !== -1;
   });
 
   if (filtered.length === 0) {
-    empty.textContent = activeTrainees().length === 0
-      ? 'No trainees yet. Add your first one to get started.'
-      : 'No trainees match your search.';
+    empty.textContent = hasAnyTrainees
+      ? 'No trainees match your search.'
+      : 'No trainees yet. Add your first one to get started.';
     empty.style.display = 'block';
     return;
   }

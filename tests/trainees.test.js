@@ -6,6 +6,18 @@ suite("trainees screen", function () {
         assertEqual(win.document.querySelectorAll(".trainee-card").length, 0);
     });
 
+    test("with no trainees, hides the search bar", async function () {
+        var win = await freshApp({});
+
+        assertEqual(win.document.querySelector(".search-field").style.display, "none");
+    });
+
+    test("once a trainee exists, shows the search bar", async function () {
+        var win = await freshApp({ trainees: [baseTrainee({ name: "Jamie Rivera" })] });
+
+        assertEqual(win.document.querySelector(".search-field").style.display, "block");
+    });
+
     test("lists trainees in sortedTrainees order", async function () {
         var busy = baseTrainee({ name: "Busy", sessions: [baseSession({ createdAt: Date.now() })] });
         var quiet = baseTrainee({ name: "Quiet", sessions: [] });
