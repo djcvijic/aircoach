@@ -206,19 +206,19 @@ function initInstallPrompt(appName) {
     var textEl = document.createElement("span");
     textEl.className = "banner-text";
 
-    var actionButton = document.createElement("button");
-    actionButton.type = "button";
-    actionButton.className = "btn btn-text banner-action";
-    actionButton.textContent = "Install";
-
     var dismissButton = document.createElement("button");
     dismissButton.type = "button";
-    dismissButton.className = "btn btn-text banner-dismiss";
+    dismissButton.className = "btn-text banner-dismiss";
     dismissButton.setAttribute("aria-label", "Dismiss install banner");
 
     var dismissIcon = document.createElement("i");
     dismissIcon.className = "fa-solid fa-xmark";
     dismissButton.appendChild(dismissIcon);
+
+    var actionButton = document.createElement("button");
+    actionButton.type = "button";
+    actionButton.className = "banner-action";
+    actionButton.textContent = "Install";
 
     bannerEl.appendChild(textEl);
     bannerEl.appendChild(actionButton);

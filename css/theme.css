@@ -574,7 +574,7 @@ body.show-to-top #to-top {
 .banner {
     display: none;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     margin-bottom: 16px;
     padding: 12px 14px;
     border-radius: 8px;
@@ -589,13 +589,19 @@ body.show-to-top #to-top {
 }
 
 .banner-action {
-    color: #0099ff;
+    flex-shrink: 0;
+    background-color: #0099ff;
+    color: white;
     font-weight: bold;
-    white-space: nowrap;
-    padding: 4px 8px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
 }
 
 .banner-dismiss {
+    flex-shrink: 0;
     color: #666;
     padding: 4px 8px;
 }
