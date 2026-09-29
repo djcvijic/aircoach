@@ -38,9 +38,12 @@
 }
 
 /* Aircoach-only override of theme.css's .btn-text size, kept out of the
-   shared theme file. */
-.bottom-nav-row .btn-text {
-    width: 52px;
-    height: 52px;
-    font-size: 26px;
+   shared theme file. Scoped to the same mobile breakpoint as theme.css's
+   bottom-nav-to-sidebar switch, so it doesn't fight the sidebar's own sizing. */
+@media screen and (max-width: 640px) {
+    .bottom-nav-row .btn-text {
+        width: 52px;
+        height: 52px;
+        font-size: 26px;
+    }
 }
