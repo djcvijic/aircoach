@@ -7,8 +7,10 @@ function renderTrainees() {
   var empty = document.getElementById('trainees-empty');
   list.innerHTML = '';
 
-  var hasAnyTrainees = activeTrainees().length > 0;
+  var activeCount = activeTrainees().length;
+  var hasAnyTrainees = activeCount > 0;
   traineesSearchField.style.display = hasAnyTrainees ? 'block' : 'none';
+  traineesSearchInput.placeholder = 'Search ' + activeCount + ' trainee' + (activeCount === 1 ? '' : 's');
 
   var query = traineesSearchInput.value.toLowerCase();
   var filtered = sortedTrainees().filter(function (trainee) {
